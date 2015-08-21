@@ -1,0 +1,88 @@
+&pgstar
+
+  ! MESA uses PGPLOT for live plotting and gives the user a tremendous
+  ! amount of control of the presentation of the information.
+
+    History_Track1_win_flag = .true.
+    History_Track1_xname = 'log_center_Rho'
+    History_Track1_yname = 'log_center_T'
+    History_Track1_xaxis_label = 'log Rho'
+    History_Track1_yaxis_label = 'log T'
+
+    History_Track1_xmin = 9.4
+    History_Track1_xmax = 10.4
+    History_Track1_ymin = 8.2
+    History_Track1_ymax = 9.5
+
+    History_Track1_reverse_xaxis = .false.
+
+
+  ! show temperature/density profile
+  ! this plots the internal structure at single timestep
+    TRho_Profile_win_flag = .true.
+
+    TRho_Profile_xmin = 9.5
+    TRho_Profile_xmax = 11.0
+    TRho_Profile_ymin = 8.0
+    TRho_Profile_ymax = 9.5
+
+  ! add legend explaining colors
+    show_TRho_Profile_legend = .true.
+
+  ! display numerical info about the star
+    show_TRho_Profile_text_info = .true.
+
+  ! set window size (aspect_ratio = height/width)
+    TRho_Profile_win_width = 8
+    TRho_Profile_win_aspect_ratio = 0.75
+
+             Profile_Panels1_win_flag = .true.
+
+         Profile_Panels1_win_width = 6
+         Profile_Panels1_win_aspect_ratio = 0.75 ! aspect_ratio = height/width
+
+         Profile_Panels1_xleft = 0.15
+         Profile_Panels1_xright = 0.85
+         Profile_Panels1_ybot = 0.15
+         Profile_Panels1_ytop = 0.85
+         Profile_Panels1_txt_scale = 1.0
+         Profile_Panels1_title = 'Profile Panels1'      
+         
+         Profile_Panels1_xaxis_name = 'mass'
+         Profile_Panels1_xaxis_reversed = .false.
+         Profile_Panels1_xmin = 0d0
+         Profile_Panels1_xmax = 1e-8
+         Profile_Panels1_xmargin = 0d0
+         Profile_Panels1_show_grid = .true.
+         
+         Profile_Panels1_yaxis_name(:) = ''
+         Profile_Panels1_yaxis_reversed(:) = .false.
+         Profile_Panels1_ymin(:) = -101d0! only used if /= -101d0
+         Profile_Panels1_ymax(:) = -101d0 ! only used if /= -101d0        
+         Profile_Panels1_ymargin(:) = 0.1 
+         Profile_Panels1_dymin(:) = -1 
+         
+         Profile_Panels1_other_yaxis_name(:) = '' 
+         Profile_Panels1_other_yaxis_reversed(:) = .false.
+         Profile_Panels1_other_ymin(:) = -101d0 ! only used if /= -101d0
+         Profile_Panels1_other_ymax(:) = -101d0 ! only used if /= -101d0
+         Profile_Panels1_other_ymargin(:) = 0.1 
+         Profile_Panels1_other_dymin(:) = -1
+         
+         ! setup default plot
+         Profile_Panels1_num_panels = 2         
+         Profile_Panels1_yaxis_name(1) = 'logT'         
+         Profile_Panels1_other_yaxis_name(1) = 'ne20'         
+         Profile_Panels1_yaxis_name(2) = 'logRho'         
+         Profile_Panels1_other_yaxis_name(2) = 'logP' 
+         
+         ! file output
+         Profile_Panels1_file_flag = .false.
+         Profile_Panels1_file_dir = 'png'
+         Profile_Panels1_file_prefix = 'profile_panels1_'
+         Profile_Panels1_file_cnt = 5 ! output when mod(model_number,Profile_Panels1_file_cnt)==0
+         Profile_Panels1_file_width = -1 ! (inches) negative means use same value as for window
+         Profile_Panels1_file_aspect_ratio = -1 ! negative means use same value as for window
+
+
+/ ! end of pgstar namelist
