@@ -1,0 +1,58 @@
+&pgstar
+
+  ! MESA uses PGPLOT for live plotting and gives the user a tremendous
+  ! amount of control of the presentation of the information.
+
+  ! show temperature/density profile
+  ! this plots the internal structure at single timestep
+    TRho_Profile_win_flag = .true.
+
+  ! add legend explaining colors
+    show_TRho_Profile_legend = .true.
+
+  ! display numerical info about the star
+    show_TRho_Profile_text_info = .true.
+
+  ! set window size (aspect_ratio = height/width)
+    TRho_Profile_win_width = 8
+    TRho_Profile_win_aspect_ratio = 0.75
+
+
+         Profile_Panels1_win_flag = .true.
+
+         Profile_Panels1_win_width = 6
+         Profile_Panels1_win_aspect_ratio = 0.75 ! aspect_ratio = height/width
+
+         Profile_Panels1_xleft = 0.15
+         Profile_Panels1_xright = 0.85
+         Profile_Panels1_ybot = 0.15
+         Profile_Panels1_ytop = 0.85
+         Profile_Panels1_txt_scale = 1.0
+         Profile_Panels1_title = 'Profile Panels1'      
+         
+         Profile_Panels1_xaxis_name = 'q'
+         Profile_Panels1_xaxis_reversed = .false.
+         Profile_Panels1_xmin = 0.0 ! only used if /= -101d0
+         Profile_Panels1_xmax = 0.8 ! only used if /= -101d0
+         Profile_Panels1_xmargin = 0d0
+         
+         Profile_Panels1_yaxis_name(:) = 'log_opacity'
+         Profile_Panels1_yaxis_reversed(:) = .false.
+         Profile_Panels1_ymin(:) = -101d0! only used if /= -101d0
+         Profile_Panels1_ymax(:) = -101d0 ! only used if /= -101d0        
+         Profile_Panels1_ymargin(:) = 0.1 
+         Profile_Panels1_dymin(:) = -1 
+         
+         Profile_Panels1_other_yaxis_name(:) = 'logT' 
+         Profile_Panels1_other_yaxis_reversed(:) = .false.
+         Profile_Panels1_other_ymin(:) = -101d0 ! only used if /= -101d0
+         Profile_Panels1_other_ymax(:) = -101d0 ! only used if /= -101d0
+         Profile_Panels1_other_ymargin(:) = 0.1 
+         Profile_Panels1_other_dymin(:) = -1
+         
+         ! setup default plot
+         Profile_Panels1_num_panels = 1       
+         Profile_Panels1_yaxis_name(1) = 'logT'         
+         Profile_Panels1_other_yaxis_name(1) = 'log_opacity'         
+
+/ ! end of pgstar namelist

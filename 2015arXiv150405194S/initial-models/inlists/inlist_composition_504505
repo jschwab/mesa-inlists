@@ -1,0 +1,45 @@
+
+&star_job
+  save_model_when_terminate = .true.
+  save_model_filename = 'models/composition_504505.mod'
+
+  load_saved_model = .true.
+  saved_model_name = 'models/pms.mod'
+
+  num_steps_to_relax_composition = 100
+
+  relax_initial_to_xaccrete = .true.
+
+  set_to_this_tau_factor = 300
+  set_tau_factor = .true.
+
+  change_net = .true.
+  new_net_name = 'ecapture.net'
+
+/ ! end of star_job namelist
+
+&controls
+  log_center_density_limit = 7
+
+  mass_change = 0
+
+  accrete_given_mass_fractions = .true.
+  num_accretion_species = 3
+  accretion_species_id(1) = 'o16'
+  accretion_species_id(2) = 'ne20'
+  accretion_species_id(3) = 'mg24'
+  accretion_species_xa(1) = 0.5
+  accretion_species_xa(2) = 0.45
+  accretion_species_xa(3) = 0.05
+
+  net_rate_factor = 0
+
+  use_Type2_opacities = .true.
+  Zbase = 0.02
+
+
+/ ! end of controls namelist
+
+&pgstar
+
+/ ! end of pgstar namelist

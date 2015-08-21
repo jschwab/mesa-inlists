@@ -1,0 +1,39 @@
+
+&star_job
+  save_model_when_terminate = .true.
+  save_model_filename = 'final.mod'
+
+  load_saved_model = .true.
+  saved_model_name = 'initial.mod'
+
+  set_to_this_tau_factor = 300
+  set_tau_factor = .true.
+
+  change_net = .true.
+  new_net_name = 'ecapture.net'
+
+/ ! end of star_job namelist
+
+&controls
+  log_center_density_limit = 9.4
+
+  mass_change = 1d-05
+
+  accrete_same_as_surface = .true.
+
+  net_rate_factor = 0
+
+  use_Type2_opacities = .true.
+  Zbase = 0.02
+
+  varcontrol_target = 0.001
+
+  delta_lgRho_cntr_limit = 0.001
+  delta_lgRho_cntr_hard_limit = 0.003
+
+
+/ ! end of controls namelist
+
+&pgstar
+
+/ ! end of pgstar namelist
