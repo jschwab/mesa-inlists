@@ -1,0 +1,48 @@
+&star_job
+    
+    load_saved_model = .true.
+    saved_model_name = '../make_initial_wd/models/mdot_1em6/final_504505.mod'
+
+    change_net = .true.
+    new_net_name = "ecapture.net"
+
+    set_tau_factor = .true.
+    set_to_this_tau_factor = 300
+
+    set_initial_age = .true.
+    initial_age = 0 ! in years
+
+    set_initial_model_number = .true.
+    initial_model_number = 0
+
+    use_special_weak_rates = .true.
+    ion_coulomb_corrections = 'PCR2009'
+    electron_coulomb_corrections = 'Itoh2002'
+
+    pgstar_flag = .false.
+
+/ !End of star_job namelist
+
+
+&controls
+
+  ! important for C/O enhanced material
+    use_Type2_opacities = .true.
+    Zbase = 0.02
+
+    use_Ledoux_criterion = .true.
+    alpha_semiconvection = 0.0
+
+    accrete_same_as_surface = .true.
+    mass_change = 1e-6
+
+  ! make output more frequent
+    max_num_profile_models = 1000
+
+  terminal_interval = 100
+  profile_interval = 0
+  history_interval = 1
+
+/ ! end of controls namelist
+
+

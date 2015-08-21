@@ -1,0 +1,22 @@
+
+&star_job
+
+/ ! end of star_job namelist
+
+&controls
+
+    log_directory = 'LOGS-spatial'
+
+    varcontrol_target = 1e-3
+    mesh_delta_coeff = 0.1
+
+    delta_lgRho_cntr_hard_limit = 3e-3
+    delta_lgRho_cntr_limit = 1e-3
+
+    max_allowed_nz = 25000
+
+/ ! end of controls namelist
+
+&pgstar
+
+/ ! end of pgstar namelist

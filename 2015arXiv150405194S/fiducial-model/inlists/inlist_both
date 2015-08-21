@@ -1,0 +1,20 @@
+
+&star_job
+
+/ ! end of star_job namelist
+
+&controls
+
+    log_directory = 'LOGS-both'
+
+    varcontrol_target = 3e-4
+    mesh_delta_coeff = 0.3
+
+    delta_lgRho_cntr_hard_limit = 1e-3
+    delta_lgRho_cntr_limit = 3e-4
+
+/ ! end of controls namelist
+
+&pgstar
+
+/ ! end of pgstar namelist
