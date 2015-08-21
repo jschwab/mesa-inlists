@@ -1,0 +1,46 @@
+! the energy levels of a given nucleus
+! these are needed to calcuate the partition function
+! each has an entry of the form (E = energy, J = spin)
+! <name> <nlevels>
+! <E_1> <J_1>
+! ...
+! <E_n> <J_n>
+
+! A = 23
+
+ne23 2
+0.000 2.5
+1.017 0.5
+
+na23 4
+0.000 1.5
+0.440 2.5
+2.076 3.5
+2.391 0.5
+
+! A = 25
+
+na25 3
+0.000 2.5
+0.090 1.5
+1,069 0.5
+
+mg25 5
+0.000 2.5
+0.585 0.5
+0.975 1.5
+1.612 3.5
+1.965 2.5
+
+! A = 27
+
+mg27 2
+0.000 0.5
+0.985 1.5
+
+al27 5
+0.000 2.5
+0.844 0.5
+1.015 1.5
+2.212 3.5
+2.735 2.5

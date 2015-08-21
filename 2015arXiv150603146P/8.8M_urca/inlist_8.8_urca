@@ -1,0 +1,135 @@
+! MESA version r7624
+
+! this evolves an the core of an 8.8 Msun star through A=23 and A=25
+! Urca process cooling.  The initial model was generated using inlists
+! from Jones et al. (2013, 2014).  This tests the special weak rate
+! implementation detailed there and in the third MESA instrument paper
+
+&star_job
+      show_log_description_at_start = .false.
+
+      load_saved_model = .true.
+      saved_model_name = 'M08.8_logRho8.95.mod'
+
+      !pgstar_flag = .true.
+
+      use_special_weak_rates = .true.
+      special_weak_states_file = 'urca.states'
+      special_weak_transitions_file = 'urca.transitions'
+      ion_coulomb_corrections = 'PCR2009'
+      electron_coulomb_corrections = 'Itoh2002'
+
+/ ! end of star_job namelist
+
+
+&controls
+
+      log_center_density_limit = 9.45
+
+      initial_mass = 8.8
+      initial_z = 0.014
+
+      mixing_length_alpha = 1.73
+
+      use_Type2_opacities = .true.
+      Zbase = 0.014d0
+
+      varcontrol_target = 1e-4
+      max_allowed_nz = 5000 ! maximum number of grid points allowed
+
+      mesh_dlog_pp_dlogP_extra = 0.8
+      mesh_dlog_cno_dlogP_extra = 0.8
+
+      mesh_dlog_3alf_dlogP_extra = 0.8
+      mesh_dlog_burn_c_dlogP_extra = 0.8
+
+      mesh_dlog_burn_n_dlogP_extra = 0.8
+      mesh_dlog_burn_o_dlogP_extra = 0.2
+
+      mesh_dlog_burn_ne_dlogP_extra = 0.2
+
+      mesh_dlog_burn_na_dlogP_extra = 0.8
+      mesh_dlog_burn_mg_dlogP_extra = 0.8
+
+      mesh_dlog_cc_dlogP_extra = 0.8
+      mesh_dlog_co_dlogP_extra = 0.8
+
+      mesh_dlog_oo_dlogP_extra = 0.2
+
+      mesh_dlog_burn_si_dlogP_extra = 0.8
+      mesh_dlog_burn_s_dlogP_extra = 0.8
+      mesh_dlog_burn_ar_dlogP_extra = 0.8
+      mesh_dlog_burn_ca_dlogP_extra = 0.8
+      mesh_dlog_burn_ti_dlogP_extra = 0.8
+      mesh_dlog_burn_cr_dlogP_extra = 0.8
+      mesh_dlog_burn_fe_dlogP_extra = 0.8
+
+      mesh_dlog_pnhe4_dlogP_extra = 0.5
+      mesh_dlog_other_dlogP_extra = 0.5
+      mesh_dlog_photo_dlogP_extra = 1
+
+
+      xa_function_species(1) = 'ne20'
+      xa_function_weight(1) = 20
+      xa_function_param(1) = 1d-2
+      xa_function_species(2) = 'o16'
+      xa_function_weight(2) = 20
+      xa_function_param(2) = 1d-2
+
+      max_delta_x_for_merge = 0.01
+      ! don't merge neighboring cells if any abundance differs by more than this
+
+      mesh_logX_species(1) = 'o16' ! iso name such as he4
+      mesh_logX_min_for_extra(1) = -6
+      mesh_dlogX_dlogP_extra(1) = 0.15
+      mesh_dlogX_dlogP_full_on(1) = 2
+      mesh_dlogX_dlogP_full_off(1) = 1
+
+      mesh_logX_species(2) = 'ne20' ! iso name such as he4
+      mesh_logX_min_for_extra(2) = -6
+      mesh_dlogX_dlogP_extra(2) = 0.15
+      mesh_dlogX_dlogP_full_on(2) = 2
+      mesh_dlogX_dlogP_full_off(2) = 1
+
+      xtra_coef_a_l_zb_czb = 0.15 ! above lower z burn convective boundary
+      xtra_coef_b_l_zb_czb = 0.15 ! below lower z burn convective boundary
+      xtra_coef_a_u_zb_czb = 0.15 ! above upper z burn convective boundary
+      xtra_coef_b_u_zb_czb = 0.15 ! below upper z burn convective boundary
+
+      delta_lgRho_cntr_limit = 0.05  
+      delta_lgRho_cntr_hard_limit = 0.1
+   
+      delta_lgT_cntr_limit = 0.01  
+      delta_lgT_cntr_hard_limit = 0.02
+
+      delta_lgTeff_limit = 0.01  
+      delta_lgTeff_hard_limit = 0.02
+   
+      delta_lgL_limit = 0.1
+      delta_lgL_hard_limit = 0.2
+
+      dX_limit_min_X = 1d-3 
+      dX_limit = 2d-3       
+
+      which_atm_option = 'simple_photosphere'
+
+      RGB_wind_scheme = 'Reimers'
+      AGB_wind_scheme = 'Blocker'
+      RGB_to_AGB_wind_switch = 1d-4
+      Reimers_wind_eta = 0.5d0  
+      Blocker_wind_eta = 0.05d0  
+
+      photostep = 50
+      profile_interval = 50
+      history_interval = 1
+      terminal_cnt = 5
+      write_header_frequency = 10
+
+
+/ ! end of controls namelist
+
+
+
+&pgstar
+
+/ ! end of pgstar namelist

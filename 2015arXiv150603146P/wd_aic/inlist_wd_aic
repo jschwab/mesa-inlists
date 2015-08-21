@@ -1,0 +1,60 @@
+! MESA version r7624
+
+! this evolves an accreting ONeMg WD up to the point of thermal
+! runaway in the core (see Schwab et al. 2015)
+! it tests the special weak rate implementation detailed there
+! and in the third MESA instrument paper
+
+&star_job
+      show_log_description_at_start = .false.
+
+      load_saved_model = .true.
+      saved_model_name = 'onemg_wd.mod'
+
+      set_tau_factor = .true.
+      set_to_this_tau_factor = 300
+
+      use_special_weak_rates = .true.
+      special_weak_states_file = 'aic.states'
+      special_weak_transitions_file = 'aic.transitions'
+      ion_coulomb_corrections = 'PCR2009'
+      electron_coulomb_corrections = 'Itoh2002'
+
+      !pgstar_flag = .true.
+
+/ ! end of star_job namelist
+
+
+&controls
+
+      log_center_temp_limit = 8.95
+
+      use_Type2_opacities = .true.
+      Zbase = 0.02d0
+
+      varcontrol_target = 1e-3
+      mesh_delta_coeff = 1.0
+
+      delta_lgRho_cntr_hard_limit = 3e-3
+      delta_lgRho_cntr_limit = 1e-3
+
+      use_Ledoux_criterion = .true.
+      alpha_semiconvection = 0d0
+
+      accrete_same_as_surface = .true.
+      mass_change = 1d-6
+
+      photostep = 50
+      profile_interval = 100
+      history_interval = 1
+      terminal_cnt = 10
+      write_header_frequency = 10
+
+
+/ ! end of controls namelist
+
+
+
+&pgstar
+
+/ ! end of pgstar namelist
