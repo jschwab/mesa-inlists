@@ -1,0 +1,133 @@
+From 9e29c235e6ba3f4cc37e4a5f7b20a2e2a51e208f Mon Sep 17 00:00:00 2001
+From: Josiah Schwab <jschwab@gmail.com>
+Date: Fri, 18 Jul 2014 12:09:02 -0700
+Subject: [PATCH 04/12] Add electron screening corrections
+
+The electron density at the nuclear is modified from the background
+density due to screening.  This implements two approaches to quantifying
+the chemical potential shift due to this affect.
+---
+ rates/private/eval_coulomb.f | 102 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 102 insertions(+)
+
+diff --git a/rates/private/eval_coulomb.f b/rates/private/eval_coulomb.f
+index 1b2a7b9..d92b47d 100644
+--- a/rates/private/eval_coulomb.f
++++ b/rates/private/eval_coulomb.f
+@@ -34,6 +34,11 @@ module mod_eval_coulomb
+   integer, parameter :: DGC1973 = 1
+   integer :: which_mui_coulomb = 1
+ 
++  ! select the option for the screening
++  integer, parameter :: ThomasFermi = 1
++  integer, parameter :: Itoh2002 = 2
++  integer :: which_vs_coulomb = 1
++
+ contains
+ 
+ #ifdef use_mic
+@@ -110,4 +115,101 @@ contains
+ 
+   end function mui_coulomb_DGC1973
+ 
++
++#ifdef use_mic
++      !dir$ attributes offload: mic :: do_Vs_coulomb
++#endif
++  function do_Vs_coulomb(cc, Z) result(Vs)
++
++    use rates_def, only: Coulomb_Info
++
++    implicit none
++
++    type(Coulomb_Info), intent(in) :: cc
++    real(dp), intent(in) :: Z ! nuclear charge
++
++    real(dp) :: Vs ! the screening potential in units of the fermi energy
++
++    select case (which_Vs_coulomb)
++    case (ThomasFermi)
++       Vs = Vs_coulomb_TF(cc, Z)
++    case (Itoh2002)
++       Vs = Vs_coulomb_Itoh(cc, Z)
++    case default
++       stop "STOP (eval_coulomb.f: do_Vs_coulomb): incorrect value of which_Vs_coulomb"
++    end select
++
++    return
++
++  end function do_Vs_coulomb
++
++
++  function Vs_coulomb_TF(cc, Z) result(Vs)
++    use const_def, only : fine, pi
++    use crlibm_lib
++    use rates_def, only: Coulomb_Info
++
++    implicit none
++
++    type(Coulomb_Info), intent(in) :: cc
++    real(dp), intent(in) :: Z ! nuclear charge
++
++    real(dp) :: Vs ! the screening potential in units of the fermi energy
++
++    ! this uses the thomas-fermi approximation, in the relativistic limit
++    Vs = 2 * Z * fine * sqrt(fine/pi)
++
++    return
++
++  end function Vs_coulomb_TF
++
++
++  function Vs_coulomb_Itoh(cc, Z) result(Vs)
++    use crlibm_lib
++    use rates_def, only: Coulomb_Info
++
++    implicit none
++
++    type(Coulomb_Info), intent(in) :: cc
++    real(dp), intent(in) :: Z ! nuclear charge
++
++    real(dp) :: Vs ! the screening potential in units of the fermi energy
++
++    ! code from Itoh, N., Tomizawa, N., Tamamura, M., Wanajo, S., & Nozawa, S. 2002, ApJ, 579, 380 
++
++    integer :: i
++    real(dp) :: rs, rs0, s, fj
++    real(dp), dimension(11), parameter :: c(0:10) = (/ &
++        0.450861E-01, 0.113078E-02, 0.312104E-02, 0.864302E-03, &
++        0.157214E-01, 0.816962E-01, 0.784921E-01,-0.680863E-01, &
++       -0.979967E-01, 0.204907E-01, 0.366713E-01 /)
++
++    rs = 1.388 * pow_cr(cc% ye * cc% den, -1d0/3d0)
++
++    rs0=0
++    if(rs.lt.0.00001)then
++       rs0=1-rs
++       rs=0.00001
++    endif
++    s=(log10(rs)+3d0)/2d0
++    fj=0
++    if(s.ne.0)then
++       do i=0,10
++          fj=c(i)*s**i+fj
++       enddo
++    else
++       fj=c(0)
++    endif
++    if(rs0.ne.0)then
++       rs=1-rs0
++    endif
++
++    Vs = 1.46d-2 * Z * fj
++
++    return
++
++  end function Vs_coulomb_Itoh
++
++
++
+ end module mod_eval_coulomb
+-- 
+2.5.0
+

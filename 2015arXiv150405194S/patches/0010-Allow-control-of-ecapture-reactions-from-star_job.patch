@@ -1,0 +1,352 @@
+From 300ab3ad04127516ea00cfa4b543a4b007cb8688 Mon Sep 17 00:00:00 2001
+From: Josiah Schwab <jschwab@gmail.com>
+Date: Wed, 23 Jul 2014 14:08:14 -0700
+Subject: [PATCH 10/12] Allow control of ecapture reactions from star_job
+
+For users interested in using these rates, add
+
+    use_special_weak_rates = .true.
+    ion_coulomb_corrections = 'PCR2009'
+    electron_coulomb_corrections = 'Itoh2002'
+
+to your star_job inlist.
+---
+ rates/private/eval_coulomb.f       |  6 ++---
+ rates/private/eval_ecapture.f      | 27 +++++++++-------------
+ rates/private/load_ecapture.f      |  6 ++---
+ rates/public/rates_def.f           |  2 ++
+ rates/public/rates_def_mic.f       |  5 +----
+ rates/public/rates_lib.f           | 46 ++++++++++++++++++++++++++++++++++++++
+ star/defaults/star_job.defaults    | 26 +++++++++++++++++++++
+ star/job/run_star_support.f        |  5 +++++
+ star/private/star_job_controls.inc |  3 +++
+ star/private/star_job_ctrls_io.f   | 12 ++++++++++
+ 10 files changed, 109 insertions(+), 29 deletions(-)
+
+diff --git a/rates/private/eval_coulomb.f b/rates/private/eval_coulomb.f
+index 22e3e35..eb47b0a 100644
+--- a/rates/private/eval_coulomb.f
++++ b/rates/private/eval_coulomb.f
+@@ -36,12 +36,10 @@ module mod_eval_coulomb
+   integer, parameter :: DGC1973 = 1
+   integer, parameter :: I1993 = 2
+   integer, parameter :: PCR2009 = 3
+-  integer :: which_mui_coulomb = 1
+ 
+   ! select the option for the electron screening
+   integer, parameter :: ThomasFermi = 1
+   integer, parameter :: Itoh2002 = 2
+-  integer :: which_vs_coulomb = 1
+ 
+ contains
+ 
+@@ -50,7 +48,7 @@ contains
+ #endif
+   function do_mui_coulomb(cc, Z) result(mu)
+ 
+-    use rates_def, only: Coulomb_Info
++    use rates_def, only: Coulomb_Info, which_mui_coulomb
+ 
+     implicit none
+ 
+@@ -296,7 +294,7 @@ contains
+ #endif
+   function do_Vs_coulomb(cc, Z) result(Vs)
+ 
+-    use rates_def, only: Coulomb_Info
++    use rates_def, only: Coulomb_Info, which_Vs_coulomb
+ 
+     implicit none
+ 
+diff --git a/rates/private/eval_ecapture.f b/rates/private/eval_ecapture.f
+index e62eec1..89b98d9 100644
+--- a/rates/private/eval_ecapture.f
++++ b/rates/private/eval_ecapture.f
+@@ -250,27 +250,20 @@ contains
+        end if
+ 
+        ! get chemical potential difference, related to coulomb correction
+-       if (do_ecapture_coulomb) then
+ 
+-          ! get ion chemical potentials (already in units of kT)
+-          muI_lhs = do_muI_coulomb(cc, Z_lhs)
+-          muI_rhs = do_muI_coulomb(cc, Z_rhs)
++       ! get ion chemical potentials (already in units of kT)
++       muI_lhs = do_muI_coulomb(cc, Z_lhs)
++       muI_rhs = do_muI_coulomb(cc, Z_rhs)
+ 
+-          ! shift should be negative (for e-capture) given our definitions
+-          delta_muI = muI_lhs - muI_rhs
+-          delta_Q = delta_muI * kT
++       ! shift should be negative (for e-capture) given our definitions
++       delta_muI = muI_lhs - muI_rhs
++       delta_Q = delta_muI * kT
+ 
+-          ! get screening potential (in fraction of fermi energy)
+-          Vs = do_Vs_coulomb(cc, Z_lhs)
+-          f_muE = 1d0 - Vs
++       ! get screening potential (in fraction of fermi energy)
++       Vs = do_Vs_coulomb(cc, Z_lhs)
++       f_muE = 1d0 - Vs
+ 
+-          if (dbg) write(*,*) eta, muI_lhs, muI_rhs, delta_muI, Vs
+-
+-       else
+-          ! no corrections
+-          delta_Q = 0
+-          f_muE = 1
+-       end if
++       if (dbg) write(*,*) eta, muI_lhs, muI_rhs, delta_muI, Vs
+ 
+        ! do the phase space integrals
+        do j = 1, ntrans
+diff --git a/rates/private/load_ecapture.f b/rates/private/load_ecapture.f
+index 0dc4492..3716aed 100644
+--- a/rates/private/load_ecapture.f
++++ b/rates/private/load_ecapture.f
+@@ -374,7 +374,6 @@ contains
+          integer, intent(out) :: ierr
+ 
+          logical :: do_ecapture_flag
+-         logical :: do_ecapture_coulomb_flag
+          integer :: num_nuclei, num_reactions
+          integer, pointer, dimension(:) :: &
+             nuclide_id, lhs_nuclide_id, rhs_nuclide_id
+@@ -402,7 +401,6 @@ contains
+          ierr = 0
+ 
+          do_ecapture_flag = do_ecapture
+-         do_ecapture_coulomb_flag = do_ecapture_coulomb
+          num_nuclei = num_ecapture_nuclei
+          num_reactions = num_ecapture_reactions
+          nuclide_id => ecapture_nuclide_id
+@@ -456,7 +454,7 @@ contains
+             transitions_offset_dict_keys, transitions_offset_dict_values)
+ 
+          !dir$ offload target(mic) out(ierr) in( &
+-            do_ecapture_flag, do_ecapture_coulomb_flag, &
++            do_ecapture_flag, &
+             num_nuclei, num_reactions, &
+             nuclide_id, lhs_nuclide_id, rhs_nuclide_id, &
+             nuclide_name, lhs_nuclide_name, rhs_nuclide_name, &
+@@ -468,7 +466,7 @@ contains
+             transitions_number_dict_keys, transitions_offset_dict_keys, &
+             transitions_number_dict_values, transitions_offset_dict_values)
+          call do_copy_ecapture_info_to_coprocessor( & 
+-            do_ecapture_flag, do_ecapture_coulomb_flag, &
++            do_ecapture_flag, &
+             num_nuclei, num_reactions, &
+             nuclide_id, lhs_nuclide_id, rhs_nuclide_id, &
+             nuclide_name, lhs_nuclide_name, rhs_nuclide_name, &
+diff --git a/rates/public/rates_def.f b/rates/public/rates_def.f
+index 648925f..12f07e6 100644
+--- a/rates/public/rates_def.f
++++ b/rates/public/rates_def.f
+@@ -232,6 +232,8 @@
+ 
+ 
+       ! coulomb corrections for weak reactions
++      integer :: which_vs_coulomb = 0
++      integer :: which_mui_coulomb = 0
+ 
+       type Coulomb_Info
+          real(dp) :: temp
+diff --git a/rates/public/rates_def_mic.f b/rates/public/rates_def_mic.f
+index 97aafa9..9d9179d 100644
+--- a/rates/public/rates_def_mic.f
++++ b/rates/public/rates_def_mic.f
+@@ -139,7 +139,6 @@
+       ! ecapture
+       
+       logical :: do_ecapture = .false.
+-      logical :: do_ecapture_coulomb = .false.
+ 
+       type (integer_dict), pointer :: ecapture_states_number_dict
+       type (integer_dict), pointer :: ecapture_states_offset_dict
+@@ -815,7 +814,7 @@
+       !dir$ attributes offload: mic :: do_copy_ecapture_info_to_coprocessor
+ #endif
+       subroutine do_copy_ecapture_info_to_coprocessor( & ! on mic
+-            do_ecapture_flag, do_ecapture_coulomb_flag, &
++            do_ecapture_flag, &
+             num_nuclei, num_reactions, &
+             nuclide_id, lhs_nuclide_id, rhs_nuclide_id, &
+             nuclide_name, lhs_nuclide_name, rhs_nuclide_name, &
+@@ -830,7 +829,6 @@
+          use utils_lib, only: integer_dict_define, integer_dict_create_hash
+          use utils_def, only: maxlen_key_string
+          logical, intent(in) :: do_ecapture_flag
+-         logical, intent(in) :: do_ecapture_coulomb_flag
+          integer, intent(in) :: num_nuclei, num_reactions
+          integer, pointer, dimension(:), intent(in) :: &
+             nuclide_id, lhs_nuclide_id, rhs_nuclide_id
+@@ -859,7 +857,6 @@
+          ierr = 0
+ 
+          do_ecapture = do_ecapture_flag
+-         do_ecapture_coulomb = do_ecapture_coulomb_flag
+          num_ecapture_nuclei = num_nuclei
+          num_ecapture_reactions = num_reactions
+          sz = num_ecapture_reactions
+diff --git a/rates/public/rates_lib.f b/rates/public/rates_lib.f
+index f30c39a..9d066ed 100644
+--- a/rates/public/rates_lib.f
++++ b/rates/public/rates_lib.f
+@@ -1090,4 +1090,50 @@
+             theta_e, num_isos, y, iso_z)
+       end subroutine coulomb_set_context
+ 
++
++      ! translate from option string to integer
++      integer function get_mui_value(option_string)
++        use mod_eval_coulomb, only : None, DGC1973, I1993, PCR2009
++
++        character(len=*), intent(in) :: option_string
++
++        select case (trim(option_string))
++        case('none')
++           get_mui_value = None
++        case('DGC1973')
++           get_mui_value = DGC1973
++        case('I1993')
++           get_mui_value = I1993
++        case('PCR2009')
++           get_mui_value = PCR2009
++        case DEFAULT
++           stop 'Incorrect option for ion_coulomb_corrections'
++        end select
++
++        return
++
++      end function get_mui_value
++
++
++      integer function get_vs_value(option_string)
++        use mod_eval_coulomb, only : None, ThomasFermi, Itoh2002
++
++        character(len=*), intent(in) :: option_string
++
++        select case (trim(option_string))
++        case('none')
++           get_vs_value = None
++        case('ThomasFermi')
++           get_vs_value = ThomasFermi
++        case('Itoh2002')
++           get_vs_value = Itoh2002
++        case DEFAULT
++           stop 'Incorrect option for electron_coulomb_corrections'
++        end select
++
++        return
++
++      end function get_vs_value
++
++
+       end module rates_lib
+diff --git a/star/defaults/star_job.defaults b/star/defaults/star_job.defaults
+index 21be8ae..da05ef1 100644
+--- a/star/defaults/star_job.defaults
++++ b/star/defaults/star_job.defaults
+@@ -748,6 +748,32 @@
+       T9_weaklib_full_off_hi_Z = 0.063d0 ! use pure reaclib for T <= this (ignore if <= 0)
+       T9_weaklib_full_on_hi_Z = 0.073d0 ! use pure weaklib for T >= this (ignore if <= 0)
+ 
++   ! controls for special weak rates
++
++      ! If this is true, calculate special weak rates using the
++      ! approach described in Schwab et al. (2015).
++
++      use_special_weak_rates = .false.
++
++      ! select which expression for the ion chemical potential to use
++      ! to calculate the energy shift associated with changing ion charge
++
++      ! + 'none': no corrections
++      ! + 'DGC1973': Dewitt, Graboske, & Cooper, M. S. 1973, ApJ, 181, 439
++      ! + 'I1993': Ichimaru, 1993, Reviews of Modern Physics, 65, 255
++      ! + 'PCR2009': Potekhin, Chabrier, & Rogers, 2009, Phys. Rev. E, 79, 016411
++
++      ion_coulomb_corrections = 'none'
++
++      ! select which expression to use to calculate the shift in the
++      ! electron chemical potential at the location of the nucleus
++
++      ! + 'none': no corrections
++      ! + 'ThomasFermi': Thomas-Fermi theory
++      ! + 'Itoh': Itoh et al., 2002, ApJ, 579, 380
++
++      electron_coulomb_corrections = 'none'
++
+ 
+ ! kap controls
+    
+diff --git a/star/job/run_star_support.f b/star/job/run_star_support.f
+index 762e3d6..ee392d0 100644
+--- a/star/job/run_star_support.f
++++ b/star/job/run_star_support.f
+@@ -1720,6 +1720,11 @@
+             T9_weaklib_full_on_hi_Z = s% job% T9_weaklib_full_on_hi_Z
+          end if
+ 
++         ! set up the special weak rates
++         do_ecapture = s% job% use_special_weak_rates
++         which_mui_coulomb = get_mui_value(s% job% ion_coulomb_corrections)
++         which_vs_coulomb = get_vs_value(s% job% electron_coulomb_corrections)
++
+          if (s% job% change_lnPgas_flag .or. &
+                (s% job% change_initial_lnPgas_flag .and. .not. restart)) then
+             write(*,*) 'new_lnPgas_flag =', s% job% new_lnPgas_flag
+diff --git a/star/private/star_job_controls.inc b/star/private/star_job_controls.inc
+index d80ff62..76a0fc6 100644
+--- a/star/private/star_job_controls.inc
++++ b/star/private/star_job_controls.inc
+@@ -221,6 +221,9 @@
+          T9_weaklib_full_off, T9_weaklib_full_on, &
+          T9_weaklib_full_off_hi_Z, T9_weaklib_full_on_hi_Z
+       
++      logical :: use_special_weak_rates
++      character (len=strlen) :: ion_coulomb_corrections, electron_coulomb_corrections
++
+       real(dp) :: mix_envelope_down_to_T, mix_initial_envelope_down_to_T
+       
+       logical :: auto_extend_net
+diff --git a/star/private/star_job_ctrls_io.f b/star/private/star_job_ctrls_io.f
+index 3fdb82d..b4ca794 100644
+--- a/star/private/star_job_ctrls_io.f
++++ b/star/private/star_job_ctrls_io.f
+@@ -266,6 +266,10 @@
+          T9_weaklib_full_off_hi_Z, &
+          T9_weaklib_full_on_hi_Z, &
+          
++         use_special_weak_rates, &
++         ion_coulomb_corrections, &
++         electron_coulomb_corrections, &
++
+          mix_envelope_down_to_T, &
+          mix_initial_envelope_down_to_T, &
+          auto_extend_net, &
+@@ -702,6 +706,10 @@
+          s% job% weaklib_blend_hi_Z = weaklib_blend_hi_Z
+          s% job% T9_weaklib_full_off_hi_Z = T9_weaklib_full_off_hi_Z
+          s% job% T9_weaklib_full_on_hi_Z = T9_weaklib_full_on_hi_Z
++
++         s% job% use_special_weak_rates = use_special_weak_rates
++         s% job% ion_coulomb_corrections = ion_coulomb_corrections
++         s% job% electron_coulomb_corrections = electron_coulomb_corrections
+          
+          s% job% mix_envelope_down_to_T = mix_envelope_down_to_T
+          s% job% mix_initial_envelope_down_to_T = mix_initial_envelope_down_to_T
+@@ -1026,6 +1034,10 @@
+          T9_weaklib_full_off_hi_Z = s% job% T9_weaklib_full_off_hi_Z
+          T9_weaklib_full_on_hi_Z = s% job% T9_weaklib_full_on_hi_Z
+          
++         use_special_weak_rates = s% job% use_special_weak_rates
++         ion_coulomb_corrections = s% job% ion_coulomb_corrections
++         electron_coulomb_corrections = s% job% electron_coulomb_corrections
++
+          mix_envelope_down_to_T = s% job% mix_envelope_down_to_T
+          mix_initial_envelope_down_to_T = s% job% mix_initial_envelope_down_to_T
+          auto_extend_net = s% job% auto_extend_net
+-- 
+2.5.0
+

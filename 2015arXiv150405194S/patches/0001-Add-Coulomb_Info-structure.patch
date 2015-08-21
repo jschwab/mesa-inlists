@@ -1,0 +1,164 @@
+From d1fc758b6dcd4e5a610e368134dce420edb20ce6 Mon Sep 17 00:00:00 2001
+From: Josiah Schwab <jschwab@gmail.com>
+Date: Mon, 7 Jul 2014 13:06:32 -0700
+Subject: [PATCH 01/12] Add Coulomb_Info structure
+
+In order to calculate coulomb corrections for the weak reactions, the
+rates module will need to know the conditions (density, temperature,
+etc) at which the reaction is occurring.
+
+This creates a structure similar to the Screen_Info structure, which
+will allow one to pass this information down as needed.
+---
+ rates/make/makefile      |  4 +--
+ rates/private/coulomb.f  | 81 ++++++++++++++++++++++++++++++++++++++++++++++++
+ rates/public/rates_def.f | 23 ++++++++++++++
+ 3 files changed, 106 insertions(+), 2 deletions(-)
+ create mode 100644 rates/private/coulomb.f
+
+diff --git a/rates/make/makefile b/rates/make/makefile
+index e650526..157f06d 100644
+--- a/rates/make/makefile
++++ b/rates/make/makefile
+@@ -17,7 +17,7 @@ LIB_OBJS = \
+    rates_def_mic.o rates_def.o \
+    rates_names.o rates_reverses.o load_weak.o eval_weak.o \
+    load_ecapture.o eval_psi.o \
+-   eval_coulomb.o eval_ecapture.o \
++   coulomb.o eval_coulomb.o eval_ecapture.o \
+    reaclib_eval.o reaclib_support_mic.o \
+    reaclib_support.o reaclib_print.o reaclib_input.o \
+    ratelib_mic.o ratelib.o pycno.o raw_rates.o \
+@@ -28,7 +28,7 @@ LIB_OBJS = \
+ 
+ $(LIB) : $(LIB_OBJS)
+ 	$(LIB_TOOL) $(LIB) $(LIB_OBJS)
+-	
++
+ #################################################################
+ 
+ #COMPILE = $(COMPILE_TO_TEST) $(FCfree)
+diff --git a/rates/private/coulomb.f b/rates/private/coulomb.f
+new file mode 100644
+index 0000000..0b9d678
+--- /dev/null
++++ b/rates/private/coulomb.f
+@@ -0,0 +1,81 @@
++! ***********************************************************************
++!
++!   Copyright (C) 2014  Josiah Schwab, Bill Paxton
++!
++!   MESA is free software; you can use it and/or modify
++!   it under the combined terms and restrictions of the MESA MANIFESTO
++!   and the GNU General Library Public License as published
++!   by the Free Software Foundation; either version 2 of the License,
++!   or (at your option) any later version.
++!
++!   You should have received a copy of the MESA MANIFESTO along with
++!   this software; if not, it is available at the mesa website:
++!   http://mesa.sourceforge.net/
++!
++!   MESA is distributed in the hope that it will be useful,
++!   but WITHOUT ANY WARRANTY; without even the implied warranty of
++!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
++!   See the GNU Library General Public License for more details.
++!
++!   You should have received a copy of the GNU Library General Public License
++!   along with this software; if not, write to the Free Software
++!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
++!
++! ***********************************************************************
++
++module coulomb
++
++  use const_def
++  use rates_def
++  use crlibm_lib
++
++  implicit none
++
++contains
++
++  subroutine do_coulomb_set_context( &
++       cc, temp, den, logT, logRho, zbar, abar, z2bar, theta_e, &
++       num_isos, y, iso_z)
++    type (Coulomb_Info), pointer :: cc
++    integer, intent(in) :: num_isos
++    real(dp), intent(in) ::  &
++         temp, den, logT, logRho, zbar, abar, z2bar, theta_e, &
++         y(:), iso_z(:)
++
++    real(dp), parameter :: x13   = 1.0d0/3.0d0 
++    real(dp), parameter :: x52   = 5.0d0/2.0d0
++    real(dp) :: qq
++    integer :: j
++
++    cc% temp  = temp
++    cc% den   = den
++    cc% logT  = logT
++    cc% logRho = logRho
++    cc% zbar  = zbar
++    cc% abar  = abar
++    cc% z2bar = z2bar
++    cc% theta_e = theta_e
++
++    ! get the info that depends only on temp, den, and overall composition         
++
++    cc% abari    = 1.0d0/abar
++    cc% rr       = den * cc% abari
++    cc% tempi    = 1.0d0/temp
++    cc% dtempi   = -cc% tempi * cc% tempi
++    cc% deni     = 1.0d0/den
++    cc% ye       = cc% zbar * cc% abari
++
++    ! calculate the other powers <z^?> that we need
++    qq = 0d0
++    do j=1,num_isos
++       qq = qq + pow_cr(iso_z(j),x52) * y(j)
++    end do
++    cc% z52bar = abar * qq
++
++    ! calculate powers of zbar
++    cc% zbar13   = pow_cr(zbar,x13)
++
++  end subroutine do_coulomb_set_context
++
++end module coulomb
++
+diff --git a/rates/public/rates_def.f b/rates/public/rates_def.f
+index 2e33933..d442749 100644
+--- a/rates/public/rates_def.f
++++ b/rates/public/rates_def.f
+@@ -230,6 +230,29 @@
+       character (len=1000) :: rates_dir, rates_cache_dir
+       
+ 
++
++      ! coulomb corrections for weak reactions
++
++      type Coulomb_Info
++         real(dp) :: temp
++         real(dp) :: den
++         real(dp) :: logT
++         real(dp) :: logRho
++         real(dp) :: theta_e
++         real(dp) :: zbar
++         real(dp) :: abar
++         real(dp) :: z2bar
++         real(dp) :: ye
++         real(dp) :: z52bar
++         real(dp) :: zbar13
++         real(dp) :: abari
++         real(dp) :: rr
++         real(dp) :: tempi
++         real(dp) :: dtempi
++         real(dp) :: deni
++         real(dp) :: pp
++      end type Coulomb_Info
++
+       
+       contains
+ 
+-- 
+2.5.0
+

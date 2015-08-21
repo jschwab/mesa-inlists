@@ -1,0 +1,4 @@
+This work did not use a MESA release version.  See
+patches/0000-cover-letter.patch for an explanation of how to exactly
+reproduce the code that was used.  You should probably just use r7624
+or later, after all this was merged to mainline MESA.

@@ -1,0 +1,91 @@
+From 95c9e6a8c9ba219bdaed0e44af8ed1bc68fd9c5f Mon Sep 17 00:00:00 2001
+From: Josiah Schwab <jschwab@gmail.com>
+Date: Tue, 22 Jul 2014 13:10:06 -0700
+Subject: [PATCH 07/12] Update bookkeeping for corrections
+
+---
+ rates/private/eval_ecapture.f | 31 ++++++++++++++++++++-----------
+ 1 file changed, 20 insertions(+), 11 deletions(-)
+
+diff --git a/rates/private/eval_ecapture.f b/rates/private/eval_ecapture.f
+index 5795ec8..e62eec1 100644
+--- a/rates/private/eval_ecapture.f
++++ b/rates/private/eval_ecapture.f
+@@ -95,7 +95,8 @@ contains
+ 
+     real(dp), dimension(max_num_ecapture_transitions) :: lambdaj, lambdaj_neu
+ 
+-    real(dp) :: Z_lhs, Z_rhs, muC_lhs, muC_rhs, delta_muC ! for coulomb corrections
++    ! for coulomb corrections
++    real(dp) :: Z_lhs, Z_rhs, muI_lhs, muI_rhs, delta_muI, delta_Q, Vs, f_muE
+ 
+     real(dp) :: neutrino, dneutrino_dlnT, dneutrino_dlnRho, &
+          gammaray, dgammaray_dlnT, dgammaray_dlnRho, lambdam1
+@@ -252,17 +253,23 @@ contains
+        if (do_ecapture_coulomb) then
+ 
+           ! get ion chemical potentials (already in units of kT)
+-          muC_lhs = do_mui_coulomb(cc, Z_lhs)
+-          muC_rhs = do_mui_coulomb(cc, Z_rhs)
++          muI_lhs = do_muI_coulomb(cc, Z_lhs)
++          muI_rhs = do_muI_coulomb(cc, Z_rhs)
+ 
+           ! shift should be negative (for e-capture) given our definitions
+-          delta_muC = muC_lhs - muC_rhs
++          delta_muI = muI_lhs - muI_rhs
++          delta_Q = delta_muI * kT
+ 
+-          if (dbg) write(*,*) eta, muC_lhs, muC_rhs, delta_muC
++          ! get screening potential (in fraction of fermi energy)
++          Vs = do_Vs_coulomb(cc, Z_lhs)
++          f_muE = 1d0 - Vs
++
++          if (dbg) write(*,*) eta, muI_lhs, muI_rhs, delta_muI, Vs
+ 
+        else
+           ! no corrections
+-          delta_muC = 0
++          delta_Q = 0
++          f_muE = 1
+        end if
+ 
+        ! do the phase space integrals
+@@ -272,14 +279,16 @@ contains
+           Ef = E_rhs(Sf(j))
+ 
+           ! calculate energy difference, including electron rest mass
+-          zeta(j) = (Qx - Ef + Ei)/ kT + delta_muC
++          zeta(j) = (Qx + delta_Q - Ef + Ei)/ kT
+ 
+           select case(rxn_type)
+           case(rxn_ecapture)
+-             call do_psi_Iec_and_Jec(beta, zeta(j), eta, deta_dlnT, deta_dlnRho, &
++             call do_psi_Iec_and_Jec(beta, zeta(j), &
++                  f_muE * eta, f_muE * deta_dlnT, f_muE * deta_dlnRho, &
+                   Ie(j), dIe_dlnT(j), dIe_dlnRho(j), Je(j), dJe_dlnT(j), dJe_dlnRho(j))
+           case(rxn_betadecay)
+-             call do_psi_Iee_and_Jee(beta, zeta(j), eta, deta_dlnT, deta_dlnRho, &
++             call do_psi_Iee_and_Jee(beta, zeta(j), &
++                  f_muE * eta, f_muE * deta_dlnT, f_muE * deta_dlnRho, &
+                   Ie(j), dIe_dlnT(j), dIe_dlnRho(j), Je(j), dJe_dlnT(j), dJe_dlnRho(j))
+           end select
+ 
+@@ -327,13 +336,13 @@ contains
+        select case(rxn_type)
+        case(rxn_ecapture)
+ 
+-          Q(i) = Qx + mue
++          Q(i) = Qx + delta_Q + mue
+           dQ_dlnT(i) = dmue_dlnT
+           dQ_dlnRho(i) = dmue_dlnRho
+ 
+        case(rxn_betadecay)
+ 
+-          Q(i) = Qx - mue
++          Q(i) = Qx + delta_Q - mue
+           dQ_dlnT(i) = -dmue_dlnT
+           dQ_dlnRho(i) = -dmue_dlnRho
+ 
+-- 
+2.5.0
+

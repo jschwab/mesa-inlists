@@ -1,0 +1,231 @@
+From 44cb1c2af77a25b48f0798c1d9b1f63eed60edbf Mon Sep 17 00:00:00 2001
+From: Josiah Schwab <jschwab@gmail.com>
+Date: Fri, 18 Jul 2014 16:16:10 -0700
+Subject: [PATCH 06/12] Add new option for ion chemical potential
+
+This adds the ability to use the Potekin, Chabrier and Rogers (2009) ion
+chemical potential to do dense plasma corrections to the weak rates.
+
+This also refactors the computation of a few commonly used quantities
+into the Coulomb_Info data structure.
+---
+ rates/private/coulomb.f      |   4 ++
+ rates/private/eval_coulomb.f | 138 +++++++++++++++++++++++++++++++++++++++++--
+ rates/public/rates_def.f     |   2 +
+ 3 files changed, 138 insertions(+), 6 deletions(-)
+
+diff --git a/rates/private/coulomb.f b/rates/private/coulomb.f
+index 0b9d678..c6639cc 100644
+--- a/rates/private/coulomb.f
++++ b/rates/private/coulomb.f
+@@ -75,6 +75,10 @@ contains
+     ! calculate powers of zbar
+     cc% zbar13   = pow_cr(zbar,x13)
+ 
++    ! calculate more complicated, but useful quantities
++    cc% gamma_e = 2.275e5_dp * pow_cr(cc% ye * cc% den, x13) * cc% tempi
++    cc% rs = 1.388_dp * pow_cr(cc% ye * cc% den, -x13)
++
+   end subroutine do_coulomb_set_context
+ 
+ end module coulomb
+diff --git a/rates/private/eval_coulomb.f b/rates/private/eval_coulomb.f
+index 5d3bbca..32fb58f 100644
+--- a/rates/private/eval_coulomb.f
++++ b/rates/private/eval_coulomb.f
+@@ -33,6 +33,7 @@ module mod_eval_coulomb
+   ! will add other approaches in the future
+   integer, parameter :: DGC1973 = 1
+   integer, parameter :: I1993 = 2
++  integer, parameter :: PCR2009 = 3
+   integer :: which_mui_coulomb = 1
+ 
+   ! select the option for the screening
+@@ -61,6 +62,8 @@ contains
+        mu = mui_coulomb_DGC1973(cc, Z)
+     case (I1993)
+        mu = mui_coulomb_I1993(cc, Z)
++    case (PCR2009)
++       mu = mui_coulomb_PCR2009(cc, Z)
+     case default
+        stop "STOP (eval_coulomb.f: do_mui_coulomb): incorrect value of which_mui_coulomb"
+     end select
+@@ -99,8 +102,7 @@ contains
+     ! via Couch & Loumos ApJ, vol. 194, Dec. 1, 1974, pt. 1, p. 385-392
+ 
+     ! coulomb coupling parameter
+-    gamma = 2.275e5_dp * pow_cr(Z,2d0/3d0) * cc% zbar * pow_cr(cc% den * cc% ye, 1d0/3d0) * cc% tempi
+-    if (debug) write(*,'(a,4(ES12.3))') "gamma = ", gamma, cc% den, cc% ye, cc% temp
++    gamma = pow_cr(Z,2d0/3d0) * cc% zbar * cc% gamma_e
+ 
+     ! it appears that Gutierrez et al. use something like
+     ! despite citing the above references
+@@ -147,9 +149,8 @@ contains
+ 
+     logical :: debug = .false.
+ 
+-    ! coulomb coupling parameter
+-    gamma = 2.275e5_dp * pow_cr(Z,5d0/3d0) * pow_cr(cc% den * cc% ye, 1d0/3d0) * cc% tempi
+-    if (debug) write(*,'(a,4(ES12.3))') "gamma = ", gamma, cc% den, cc% ye, cc% temp
++    ! coulomb coupling parameter for species with charge Z
++    gamma = cc% gamma_e * pow_cr(Z,5d0/3d0)
+ 
+     ! ratios for convenience
+     gamma14 = pow_cr(gamma, 1d0/4d0)
+@@ -161,6 +162,131 @@ contains
+   end function mui_coulomb_I1993
+ 
+ 
++  function mui_coulomb_PCR2009(cc, Z) result(mu)
++    use crlibm_lib
++    use rates_def, only: Coulomb_Info
++
++    ! calulate the chemical potential of an ion
++
++    implicit none
++
++    type(Coulomb_Info), intent(in) :: cc
++    real(dp), intent(in) :: Z ! nuclear charge
++
++    real(dp) :: mu ! the chemical potential in units of kT
++
++    real(dp) :: a, b
++    real(dp) :: alpha, beta, gamma, delta
++
++    logical :: debug = .false.
++
++    ! expressions taken from 
++    ! [CP98]: Chabrier, G., \& Potekhin, A.~Y.\ 1998, \pre, 58, 4941
++    ! [PC00]: Potekhin, A.~Y., \& Chabrier, G.\ 2000, \pre, 62, 8554 
++    ! [P+09a]: Potekhin, A.~Y., Chabrier, G., \& Rogers, F.~J.\ 2009, \pre, 79, 016411
++    ! [P+09b]: Potekhin, A.~Y., Chabrier, G., Chugunov, A.~I., Dewitt, H.~E., \& Rogers, F.~J.\ 2009, \pre, 80, 047401
++
++    ! coulomb coupling parameter for species with charge Z
++    gamma = cc% gamma_e * pow_cr(Z, 5d0/3d0)
++
++    ! first, calculate the shift from the linear mixing relation (LMR)
++    ! see equation 2 from [P+09b]
++
++    mu = fii(gamma) + fie(cc% rs, cc% gamma_e, Z)
++
++    ! no need to do LMR corrections for now
++
++    ! ! next, calculate the correction to the linear mixing relation (LMR)
++
++    ! ! equations 10a, 11 & 12 from [P+09b]
++    ! alpha = pow_cr(zbar, 2d0/5d0) / pow_cr(z2bar, 1d0/5d0)
++    ! beta = 3d0 / (2d0 * alpha) - 1d0
++    ! delta = 1d0 - pow_cr(zbar2, 3d0/2d0) / (sqrt(zbar) * z52bar)
++    ! a = (2.6d0 * delta + 14 * pow_cr(delta, 3d0)) / (1d0 - alpha)
++    ! b = 0.0117d0 * pow_cr(z2bar/(zbar*zbar), 2d0) * a
++
++    ! ! equation 9 from [P+09b]
++    ! deltaf = (gamma_e * z52bar / sqrt(3d0)) * & 
++    !      (delta / ((1d0 + a * pow_cr(gamma, alpha)) * pow_cr(1d0 + b * pow_cr(gamma, alpha), beta)))
++
++
++
++    return
++
++  contains
++
++    function fii(gamma) result(f)
++
++      implicit none
++
++      real(dp), intent(in) :: gamma
++      real(dp) :: f
++
++      ! define parameters
++      real(dp), parameter :: A1 = -0.907347
++      real(dp), parameter :: A2 = 0.62849
++      real(dp) :: A3
++      real(dp), parameter :: B1 = 0.0045
++      real(dp), parameter :: B2 = 170
++      real(dp), parameter :: B3 = -8.4d-5
++      real(dp), parameter :: B4 = 0.0037
++
++      A3 = -sqrt(3d0)/2d0 - A1/sqrt(A2)
++
++      ! [CP00] Eq. (28)
++      f = A1 * (sqrt(gamma * (A2 + gamma)) - A2 * log_cr(sqrt(gamma/A2) + sqrt(1+gamma/A2))) + &
++          2 * A3 * (sqrt(gamma) - atan_cr(sqrt(gamma)))
++
++      return 
++
++    end function fii
++
++    function fie(rs, gamma_e, Z) result(f)
++
++      implicit none
++
++      real(dp), intent(in) :: rs
++      real(dp), intent(in) :: gamma_e
++      real(dp), intent(in) :: Z
++
++      real(dp) :: f
++
++      real(dp) :: logZ
++      real(dp) :: c_DH, c_inf, c_TF, g1, g2, h1, h2
++      real(dp) :: a, b, x, nu
++
++      ! [CP00], between eq 31 and 32
++      logZ = log_cr(Z)
++      a = 1.11_dp * pow_cr(Z, 0.475_dp)
++      b = 0.2_dp + 0.078_dp * logZ * logZ
++      nu = 1.16_dp + 0.08_dp * logZ
++
++      ! [CP00], eq 30 and eq 31
++      c_DH = Z / sqrt(3d0) * (pow_cr(1+Z,3d0/2d0) - 1d0 - pow_cr(Z,3d0/2d0))
++      c_inf = 0.2513_dp
++      c_TF = c_inf * pow_cr(Z,7d0/3d0) * (1d0 - pow_cr(Z,-1d0/3d0) + 0.2d0 * pow_cr(Z,-1d0/2d0))
++
++      ! [CP00], eq 32 and eq 33
++      g1 = 1 + (0.78 / (21d0 + gamma_e * pow_cr(Z/rs, 3d0))) * sqrt(gamma_e/Z)
++      g2 = 1 + (Z-1d0)/9d0 * (1d0 + 1d0/(0.001d0*Z*Z + 2*gamma_e)) * pow_cr(rs,3d0) / (1d0 + 6d0 * rs * rs)
++
++      ! [CP00] eq 4
++      x = 0.014005_dp / rs
++
++      ! [CP98], below eq 33
++      h1 = 1d0 / (1d0 + pow_cr(x/sqrt(1+x*x),6d0) * pow_cr(Z,-1d0/3d0))
++      h2 = 1d0 / sqrt(1+x*x)
++
++      f = - gamma_e * (c_DH * sqrt(gamma_e) + c_TF * a * pow_cr(gamma_e, nu) * g1 * h1) / & 
++                      (1d0 + (b * sqrt(gamma_e) + a * g2 * pow_cr(gamma_e, nu)/rs) * h2)
++
++
++    end function fie
++
++  end function mui_coulomb_PCR2009
++
++
++
+ #ifdef use_mic
+       !dir$ attributes offload: mic :: do_Vs_coulomb
+ #endif
+@@ -229,7 +355,7 @@ contains
+         0.157214E-01, 0.816962E-01, 0.784921E-01,-0.680863E-01, &
+        -0.979967E-01, 0.204907E-01, 0.366713E-01 /)
+ 
+-    rs = 1.388 * pow_cr(cc% ye * cc% den, -1d0/3d0)
++    rs = cc% rs
+ 
+     rs0=0
+     if(rs.lt.0.00001)then
+diff --git a/rates/public/rates_def.f b/rates/public/rates_def.f
+index d442749..648925f 100644
+--- a/rates/public/rates_def.f
++++ b/rates/public/rates_def.f
+@@ -251,6 +251,8 @@
+          real(dp) :: dtempi
+          real(dp) :: deni
+          real(dp) :: pp
++         real(dp) :: rs
++         real(dp) :: gamma_e
+       end type Coulomb_Info
+ 
+       
+-- 
+2.5.0
+

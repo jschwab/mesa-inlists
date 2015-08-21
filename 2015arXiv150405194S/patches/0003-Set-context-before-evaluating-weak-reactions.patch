@@ -1,0 +1,144 @@
+From 99dcc567f4a2eb53df43fc0abb6f4f1b0b8a4f8e Mon Sep 17 00:00:00 2001
+From: Josiah Schwab <jschwab@gmail.com>
+Date: Mon, 7 Jul 2014 15:17:25 -0700
+Subject: [PATCH 03/12] Set context before evaluating weak reactions
+
+The Coulomb_Info structure needs to be populated before evaluating the
+weak reactions.  The net module now calls coulomb_set_context before
+calling eval_weak_reaction_info.
+
+This also adjusts the call signature of all of the calls to
+eval_weak_reaction_info in the net module to include the Coulomb_Info
+structure.
+
+In the case of eval1_weak_rate and do_eval_nse_eps_info, the
+Coulomb_Info structure is passed, but left un-populated, since it will
+remain unused deeper down.  This is because the reactions that will be
+evaluated (e.g., eval_ni56_ec_rate) aren't calculated using the ecapture
+module.
+---
+ net/private/net_derivs.f |  7 +++++--
+ net/private/net_eval.f   | 29 ++++++++++++++++++++++++++---
+ nse/private/mod_nse.f    | 11 ++++++++---
+ 3 files changed, 39 insertions(+), 8 deletions(-)
+
+diff --git a/net/private/net_derivs.f b/net/private/net_derivs.f
+index c1ff3ec..d62e519 100644
+--- a/net/private/net_derivs.f
++++ b/net/private/net_derivs.f
+@@ -1595,6 +1595,7 @@
+             id, temp, ye, rho, eta, zbar, weak_rate_factor, &
+             rate_out, d_rate_dlnT, d_rate_dlnRho, Q_out, Qneu_out, &
+             reuse_rate_screened, ierr)       
++         use rates_def, only: Coulomb_Info
+          use rates_lib, only: eval_weak_reaction_info
+ 		   integer, intent(in) :: id
+          real(dp), intent(in) :: temp, ye, rho, eta, zbar, weak_rate_factor
+@@ -1604,6 +1605,8 @@
+ 		   integer, intent(out) :: ierr
+          
+ 		   integer :: ids(1)
++           type(Coulomb_Info), pointer :: cc
++           type(Coulomb_Info), target :: cc_info
+ 		   real(dp) :: T9, YeRho, d_eta_dlnT, d_eta_dlnRho
+ 		   ! lambda = combined rate = 10**ldecay + 10**lcapture
+ 		   ! Q and Qneu are for combined rate of beta decay and electron capture.
+@@ -1662,9 +1665,9 @@
+ 	      YeRho = ye*rho
+ 	      d_eta_dlnT = 0
+ 	      d_eta_dlnRho = 0
+-         
++          cc => cc_info        
+          call eval_weak_reaction_info( &
+-            1, ids, T9, YeRho, zbar, &
++            1, ids, cc, T9, YeRho, zbar, &
+             eta, d_eta_dlnT, d_eta_dlnRho, &
+             ldecay, d_ldecay_dT9, d_ldecay_dlYeRho, &
+             lcapture, d_lcapture_dT9, d_lcapture_dlYeRho, &
+diff --git a/net/private/net_eval.f b/net/private/net_eval.f
+index 9feacd5..8be3dcc 100644
+--- a/net/private/net_eval.f
++++ b/net/private/net_eval.f
+@@ -619,15 +619,38 @@
+          !dir$ attributes offload: mic :: get_weaklib_rates
+ #endif         
+          subroutine get_weaklib_rates(ierr)
+-            use rates_def, only : do_ecapture
+-            use rates_lib, only: eval_weak_reaction_info
++            use rates_def, only : Coulomb_Info
++            use rates_lib, only: eval_weak_reaction_info, coulomb_set_context
+             use net_def, only: other_kind
++
++            type (Coulomb_Info), target :: cc_info
++            type (Coulomb_Info), pointer :: cc
++            real(dp) :: iso_z(num_isos)
++
+             integer, intent(out) :: ierr
+             integer :: i, j, id
+             include 'formats.dek'
++
++            ! before getting the weaklib rates, the Coulomb_Info
++            ! structure must be populated.  the ecapture routines need
++            ! to know some local quantities (functions of the density,
++            ! temperature, and composition), to calculate Coulomb
++            ! corrections to the rates
++
++            ierr = 0
++            cc => cc_info
++
++            do i=1,num_isos
++               iso_z(i) = chem_isos% Z(n% g% chem_id(i))
++            end do
++
++            call coulomb_set_context( &
++               cc, temp, rho, logtemp, logrho, zbar, abar, z2bar,  &
++               n% theta_e_for_graboske_et_al, num_isos, n% y, iso_z)
++
+             call eval_weak_reaction_info( &
+                num_weaklib_rates, g% weaklib_ids(1:num_weaklib_rates),  &
+-               temp*1d-9, ye*rho, zbar, eta, d_eta_dlnT, d_eta_dlnRho, &
++               cc, temp*1d-9, ye*rho, zbar, eta, d_eta_dlnT, d_eta_dlnRho, &
+                n% ldecay, n% d_ldecay_dT9, n% d_ldecay_dlYeRho, &
+                n% lcapture, n% d_lcapture_dT9, n% d_lcapture_dlYeRho, &
+                n% lneutrino, n% d_lneutrino_dT9, n% d_lneutrino_dlYeRho, &
+diff --git a/nse/private/mod_nse.f b/nse/private/mod_nse.f
+index 02eb476..9457f66 100644
+--- a/nse/private/mod_nse.f
++++ b/nse/private/mod_nse.f
+@@ -547,7 +547,7 @@
+             Y_nse, T9, Ye, Rho, eta, zbar, &
+             nse_eps_nuc_total, nse_eps_neu, rate, drate_dYe, ierr)
+          use rates_lib, only: eval_weak_reaction_info
+-         use rates_def, only: weak_lhs_nuclide_id, weak_rhs_nuclide_id
++         use rates_def, only: weak_lhs_nuclide_id, weak_rhs_nuclide_id, Coulomb_Info
+          use const_def, only: Qconv, ln10
+          
+          real(dp), pointer, intent(in) :: Y_nse(:)
+@@ -578,8 +578,11 @@
+             d_lambda_dlYeRho, d_lambda_dYe, eps1
+          integer :: j, ir, cid, i, delta_N
+ 
++         type(Coulomb_Info), pointer :: cc
++         type(Coulomb_Info), target :: cc_info
++
+          include 'formats.dek'
+-         
++
+          ierr = 0
+          
+          YeRho = Ye*Rho
+@@ -610,8 +613,10 @@
+          
+          d_eta_dlnT = 0
+          d_eta_dlnRho = 0
++         cc => cc_info
++
+          call eval_weak_reaction_info( &
+-		      nse_num_weaklib_rates, nse_weaklib_ids, T9, YeRho, zbar, &
++		      nse_num_weaklib_rates, nse_weaklib_ids, cc, T9, YeRho, zbar, &
+ 		      eta, d_eta_dlnT, d_eta_dlnRho, &
+ 		      ldecay, d_ldecay_dT9, d_ldecay_dlYeRho, &
+ 		      lcapture, d_lcapture_dT9, d_lcapture_dlYeRho, &
+-- 
+2.5.0
+

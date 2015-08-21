@@ -1,0 +1,124 @@
+From a8691d2f4cfda84dadc47ed1e38e04a5a662017f Mon Sep 17 00:00:00 2001
+From: Josiah Schwab <jschwab@gmail.com>
+Date: Fri, 21 Aug 2015 09:17:25 -0700
+Subject: [PATCH 00/12] Modify calculation of A=24 & A=20 weak reactions
+
+This code improves the MESA weak rates in dense plasmas where the
+Fermi energy is comparable to the enery gap of the transitions.  It
+calculates the rates on-the-fly in a way that avoids issues associated
+with interpolation in sparse tables.  See Schwab, Quataert, and
+Bildsten (2015) for a a detailed explanation of the implementation and
+Paxton et al. (2015) for verification tests.
+
+To directly reproduce Schwab et al. (2015), follow these instructions.
+
+Howevever, unless you really need to use this exact version, you're
+probably better off using r7624 or later, where these changes are have
+been integrated into mainline MESA.
+
+Download a fresh copy of mesa r6596.  Probably best to go grab the zip
+files from here:
+
+    http://sourceforge.net/projects/mesa/files/releases/
+
+Unzip it, and rename to mesa-weak to avoid confusion.
+
+Save the patch directory.  It contains all the patches necessary to
+use the on-the-fly weak rates.  Then, while in the mesa-weak
+directory, run the command
+
+    for p in patches/*.patch; do patch -p1 < $p; done
+
+which applies all the patches.  The output should look like:
+
+,----
+| patch: **** Only garbage was found in the patch input.
+| patching file rates/make/makefile
+| patching file rates/private/coulomb.f
+| patching file rates/public/rates_def.f
+| patching file rates/private/eval_coulomb.f
+| patching file rates/private/eval_ecapture.f
+| patching file rates/public/rates_lib.f
+| patching file rates/test/src/test_ecapture.f
+| patching file rates/test/src/test_weak.f
+| patching file rates/test/test_output
+| patching file net/private/net_derivs.f
+| patching file net/private/net_eval.f
+| patching file nse/private/mod_nse.f
+| patching file rates/private/eval_coulomb.f
+| patching file rates/private/eval_coulomb.f
+| patching file rates/private/coulomb.f
+| patching file rates/private/eval_coulomb.f
+| patching file rates/public/rates_def.f
+| patching file rates/private/eval_ecapture.f
+| patching file data/rates_data/ecapture_states.list
+| patching file data/rates_data/ecapture_transitions.list
+| patching file rates/private/eval_coulomb.f
+| patching file rates/private/eval_coulomb.f
+| patching file rates/public/rates_def.f
+| patching file rates/public/rates_lib.f
+| patching file star/defaults/star_job.defaults
+| patching file star/job/run_star_support.f
+| patching file star/private/star_job_controls.inc
+| patching file star/private/star_job_ctrls_io.f
+| patching file rates/test/src/test_ecapture.f
+| patching file rates/test/test_output
+`----
+
+Now, install MESA as usual
+
+    ./install
+
+and everything should go smoothly.
+
+To use the new weak rates, add the following controls to your star_job
+inlist
+
+    use_special_weak_rates = .true.
+    ion_coulomb_corrections = 'PCR2009'
+    electron_coulomb_corrections = 'Itoh2002'
+
+With those settings, you should see electron captures happen on Mg-24
+around logRho = 9.6 and on Ne-20 around logRho = 9.95.
+
+
+Josiah Schwab (12):
+  Add Coulomb_Info structure
+  Pass Coulomb_Info through weak rates calls
+  Set context before evaluating weak reactions
+  Add electron screening corrections
+  Add corrections used by Juodagalvis
+  Add new option for ion chemical potential
+  Update bookkeeping for corrections
+  Update A=20,24 weak rates
+  Add corrections that do nothing
+  Allow control of ecapture reactions from star_job
+  Rewrite special weak reaction tests
+  Fix bug in weak derivatives
+
+ data/rates_data/ecapture_states.list      |   4 +-
+ data/rates_data/ecapture_transitions.list |  54 +-
+ net/private/net_derivs.f                  |   7 +-
+ net/private/net_eval.f                    |  29 +-
+ nse/private/mod_nse.f                     |  11 +-
+ rates/make/makefile                       |   4 +-
+ rates/private/coulomb.f                   |  85 ++++
+ rates/private/eval_coulomb.f              | 335 +++++++++++-
+ rates/private/eval_ecapture.f             |  48 +-
+ rates/private/load_ecapture.f             |   6 +-
+ rates/public/rates_def.f                  |  27 +
+ rates/public/rates_def_mic.f              |   5 +-
+ rates/public/rates_lib.f                  |  86 +++-
+ rates/test/src/test_ecapture.f            | 815 +++++++++++++-----------------
+ rates/test/src/test_weak.f                |   4 +-
+ rates/test/test_output                    |  51 +-
+ star/defaults/star_job.defaults           |  26 +
+ star/job/run_star_support.f               |   5 +
+ star/private/star_job_controls.inc        |   3 +
+ star/private/star_job_ctrls_io.f          |  12 +
+ 20 files changed, 1071 insertions(+), 546 deletions(-)
+ create mode 100644 rates/private/coulomb.f
+
+-- 
+2.5.0
+

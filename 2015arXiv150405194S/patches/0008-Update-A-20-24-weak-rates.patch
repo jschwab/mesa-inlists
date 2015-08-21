@@ -1,0 +1,112 @@
+From c8575bbc214499861abdc47d0fde919e70a39033 Mon Sep 17 00:00:00 2001
+From: Josiah Schwab <jschwab@gmail.com>
+Date: Wed, 5 Feb 2014 13:23:00 -0800
+Subject: [PATCH 08/12] Update A=20,24 weak rates
+
+Use the log-(ft) values from Martinez-Pinedo et al. (2014), but
+excluding the forbidden transition.
+---
+ data/rates_data/ecapture_states.list      |  4 +--
+ data/rates_data/ecapture_transitions.list | 54 +++++++++++++++++++++----------
+ 2 files changed, 39 insertions(+), 19 deletions(-)
+
+diff --git a/data/rates_data/ecapture_states.list b/data/rates_data/ecapture_states.list
+index 2d29a0a..b8a29c6 100644
+--- a/data/rates_data/ecapture_states.list
++++ b/data/rates_data/ecapture_states.list
+@@ -43,6 +43,6 @@ ne24 6
+ 0.000 0
+ 1.981 2
+ 3.867 2
+-3.962 4
++3.972 4
+ 4.764 0
+-4.886 3
++4.817 3
+diff --git a/data/rates_data/ecapture_transitions.list b/data/rates_data/ecapture_transitions.list
+index 2a06ff0..97ea461 100644
+--- a/data/rates_data/ecapture_transitions.list
++++ b/data/rates_data/ecapture_transitions.list
+@@ -7,41 +7,61 @@
+ ! electron capture transitions
+ ! A = 20: ne -> f -> o
+ 
++! (1.634 2+) -> (0.000 2+)
++! (0.000 0+) -> (1.057 1+)
+ ne20 f20  2
+-2 1 5.040
+-1 5 4.669
++2 1 4.970
++1 5 4.380
+ 
++! (0.000 2+) -> (1.674 2+)
++! (1.057 1+) -> (0.000 0+)
+ f20  o20  2
+-1 2 5.414
+-5 1 4.515
++1 2 5.429
++5 1 4.211
+ 
+ ! A = 24: mg -> na -> ne
+ 
++! (0.000 0+) -> (0.472 1+)
++! (0.000 0+) -> (1.347 1+)
+ mg24 na24 2
+-1 2 5.061
+-1 6 3.838
++1 2 4.815
++1 6 3.772
+ 
++! (0.000 4+) -> (3.972 4+)
++! (0.000 4+) -> (4.866 3+)
++! (0.472 1+) -> (0.000 0+)
+ na24 ne24 3
+-1 4 6.606
+-1 6 4.322
+-2 1 5.046
++1 4 6.209
++1 6 4.423
++2 1 4.829
+ 
+ ! beta decay transitions
+ ! A = 20: o -> f -> ne
+ 
++! (0.000 2+) -> (1.634 2+)
++! (1.057 1+) -> (0.000 0+)
+ f20  ne20 2
+-1 2 5.040
+-5 1 4.669
++1 2 4.970
++5 1 4.380
+ 
++! (1.674 2+) -> (0.000 2+)
++! (0.000 0+) -> (1.057 1+)
+ o20  f20  2
+-1 5 4.515
+-2 1 5.414
++2 1 5.429
++1 5 4.211
+ 
+ ! A = 24: ne -> na -> mg
++! (0.472 1+) -> (0.000 0+)
++! (1.347 1+) -> (0.000 0+)
+ 
+ na24 mg24 2
+-2 1 5.061
+-2 2 6.091
++2 1 4.815
++6 1 3.772
+ 
+-ne24 na24 1
+-1 2 5.046
+\ No newline at end of file
++! (3.972 4+) -> (0.000 4+)
++! (4.866 3+) -> (0.000 4+)
++! (0.000 0+) -> (0.472 1+)
++ne24 na24 3
++4 1 6.209
++6 1 4.423
++1 2 4.829
+-- 
+2.5.0
+

@@ -1,0 +1,38 @@
+From a8691d2f4cfda84dadc47ed1e38e04a5a662017f Mon Sep 17 00:00:00 2001
+From: Josiah Schwab <jschwab@gmail.com>
+Date: Wed, 1 Apr 2015 19:56:46 -0700
+Subject: [PATCH 12/12] Fix bug in weak derivatives
+
+The weak reaction derivatives with respect to lnT were all missing a
+factor of the level occupation probabilities.  It was in my notes...
+---
+ rates/private/eval_ecapture.f | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/rates/private/eval_ecapture.f b/rates/private/eval_ecapture.f
+index 89b98d9..9af280c 100644
+--- a/rates/private/eval_ecapture.f
++++ b/rates/private/eval_ecapture.f
+@@ -305,15 +305,15 @@ contains
+ 
+        lambda(i) = sum(lambdaj(1:ntrans) * Pj(1:ntrans))
+        dlambda_dlnT(i) = sum(lambdaj(1:ntrans) *  &
+-            ( dPj_dlnT(1:ntrans) + dIe_dlnT(1:ntrans)/Ie(1:ntrans)))
++            ( dPj_dlnT(1:ntrans) + Pj(1:ntrans) * dIe_dlnT(1:ntrans)/Ie(1:ntrans)))
+        dlambda_dlnRho(i) = sum(lambdaj(1:ntrans) * &
+-            dIe_dlnRho(1:ntrans)/Ie(1:ntrans))
++            Pj(1:ntrans) * dIe_dlnRho(1:ntrans)/Ie(1:ntrans))
+ 
+        neutrino = mec2 * sum(lambdaj_neu(1:ntrans) * Pj(1:ntrans))
+        dneutrino_dlnT = mec2 * sum(lambdaj_neu(1:ntrans) * &
+-            ( dPj_dlnT(1:ntrans) + dJe_dlnT(1:ntrans)/Je(1:ntrans)))
++            ( dPj_dlnT(1:ntrans) + Pj(1:ntrans) * dJe_dlnT(1:ntrans)/Je(1:ntrans)))
+        dneutrino_dlnRho = mec2 * sum(lambdaj_neu(1:ntrans) * &
+-            dJe_dlnRho(1:ntrans)/Je(1:ntrans))
++            Pj(1:ntrans) * dJe_dlnRho(1:ntrans)/Je(1:ntrans))
+ 
+        if (lambda(i) .gt. 1d-30) then
+           lambdam1 = 1.0_dp / lambda(i)
+-- 
+2.5.0
+

@@ -1,0 +1,996 @@
+From 4a2b0749192399f50c75ca8a1dc6f4b6f1aad4f4 Mon Sep 17 00:00:00 2001
+From: Josiah Schwab <jschwab@gmail.com>
+Date: Thu, 11 Dec 2014 12:36:56 -0800
+Subject: [PATCH 11/12] Rewrite special weak reaction tests
+
+The tests that exercise the weak reactions activiated by
+use_special_weak_rates and related routines were rewritten to be simpler
+and quicker.
+---
+ rates/test/src/test_ecapture.f | 833 +++++++++++++++++------------------------
+ rates/test/test_output         |  51 ++-
+ 2 files changed, 394 insertions(+), 490 deletions(-)
+
+diff --git a/rates/test/src/test_ecapture.f b/rates/test/src/test_ecapture.f
+index 05ef1a7..ec2ec63 100644
+--- a/rates/test/src/test_ecapture.f
++++ b/rates/test/src/test_ecapture.f
+@@ -1,561 +1,432 @@
+-   module test_ecapture
++module test_ecapture
+ 
+-      use const_def
+-      use rates_def
+-      use rates_lib
+-      use num_lib
+-      use utils_lib
+-      use crlibm_lib
+-      
+-      implicit none
++  use const_def
++  use eos_def
++  use eos_lib
++  use rates_def
++  use rates_lib
++  use num_lib
++  use utils_lib
++  use crlibm_lib
+ 
+-      real(dp) :: X, Z, Y, abar, zbar, z2bar, ye
+-      integer, parameter :: species = 7
+-      integer, parameter :: h1=1, he4=2, c12=3, n14=4, o16=5, ne20=6, mg24=7
+-      integer, pointer, dimension(:) :: net_iso, chem_id
+-      real(dp) :: xa(species)
+-      integer :: handle
++  implicit none
+ 
++  real(dp) :: X, Z, Y, abar, zbar, z2bar, ye
++  integer, parameter :: species = 7
++  integer, parameter :: h1=1, he4=2, c12=3, n14=4, o16=5, ne20=6, mg24=7
++  integer, pointer, dimension(:) :: net_iso, chem_id
++  real(dp), dimension(species) :: xa, ya, za, aa
++  integer :: handle, i, ierr
+ 
+-      contains
++  real(dp) :: log10T, T, log10Rho, Rho
+ 
++contains
+ 
+-      subroutine do_test_ecapture
+ 
+-          do_ecapture = .true.
++  subroutine do_test_ecapture
+ 
+-          call Setup_eos(handle)
++    do_ecapture = .true.
+ 
+-          ! first test the phase space integral functions
++    call Init_Composition
++    call Setup_eos(handle)
+ 
+-          call do_test_derivs(-10.0_dp,1d-3,0.0_dp)
+-          call do_test_derivs(-10.0_dp,0.0_dp,1d-3)
++    log10Rho = 9.5
++    Rho = exp10_cr(log10Rho)
++    log10T = 8.5
++    T = exp10_cr(log10T)
+ 
+-          call do_test_derivs(10.0_dp,1d-3,0.0_dp)
+-          call do_test_derivs(10.0_dp,0.0_dp,1d-3)
++    ! first test the phase space integral functions
+ 
+-          call do_test_coulomb
++    write(*,*)
++    write(*,*) 'do_test_derivs'
+ 
+-          ! at present this output of test routine is not particularly
+-          ! meaningful so don't do it (jschwab)
+-          ! call do_test_ec
++    call do_test_derivs(-10.0_dp,1d-3,0.0_dp)
++    call do_test_derivs(-10.0_dp,0.0_dp,1d-3)
+ 
+-          ! this test needs improved as well (jschwab)
+-          ! call do_test_betadecay
++    call do_test_derivs(10.0_dp,1d-3,0.0_dp)
++    call do_test_derivs(10.0_dp,0.0_dp,1d-3)
+ 
+-      end subroutine do_test_ecapture
++    write(*,*) 'done'
++    write(*,*)
+ 
++    ! check that the coulomb corrections are behaving
+ 
+-      subroutine do_test_betadecay
++    write(*,*)
++    write(*,*) 'do_test_coulomb'
+ 
+-         real(dp) :: beta   ! mec2 / kT
+-         real(dp) :: zeta   ! Q_n / kT
+-         real(dp) :: eta    ! chemical potential / kT
+-         real(dp) :: deta_dlnT, deta_dlnRho ! and derivs
++    call do_test_coulomb
+ 
+-         real(dp) :: I, J    ! phase space integral
+-         real(dp) :: dI_dlnT, dI_dlnRho ! and derivatives
+-         real(dp) :: dJ_dlnT, dJ_dlnRho ! and derivatives
++    write(*,*) 'done'
++    write(*,*)
+ 
+-         integer :: k, neta
+-         real(dp) :: etamin, etamax, deltaeta
+-         real(dp) :: dx
+ 
+-         beta = 1
+-         zeta = 10
++    ! check that the special weak reactions are working
+ 
+-         etamin = 1
+-         etamax = 100
+-         deltaeta = 1
++    write(*,*)
++    write(*,*) 'do_test_special_weak'
+ 
+-         neta = int((etamax - etamin)/deltaeta)
++    call do_test_special_weak(.false.)
++    call do_test_special_weak(.true.)
+ 
+-         do k = 0, neta
++    write(*,*) 'done'
++    write(*,*)
+ 
+-             eta = etamin + deltaeta * k
+-             deta_dlnRho = eta / 3.0
+-             deta_dlnT = -eta
++    ! deallocate the eos tables
++    call free_eos_handle(handle)
++    call eos_shutdown
++
++  end subroutine do_test_ecapture
+ 
+-             call psi_Iee_and_Jee(beta, zeta, eta, deta_dlnT, deta_dlnRho, &
+-                     I, dI_dlnT, dI_dlnRho, J, dJ_dlnT, dJ_dlnRho)
+-
+-             write(*,*) eta, I, J
+ 
+-         end do
++  subroutine do_test_derivs(q,dx,dy)
+ 
+-      end subroutine do_test_betadecay
++    real(dp) :: beta   ! mec2 / kT
++    real(dp) :: zeta   ! Q_n / kT
++    real(dp) :: eta    ! chemical potential / kT
++    real(dp) :: deta_dlnT, deta_dlnRho ! and derivs
+ 
++    real(dp) :: I, J    ! phase space integral
++    real(dp) :: dI_dlnT, dI_dlnRho ! and derivatives
++    real(dp) :: dJ_dlnT, dJ_dlnRho ! and derivatives
+ 
++    real(dp) :: Im, Jm    ! phase space integral
++    real(dp) :: dIm_dlnT, dIm_dlnRho ! and derivatives
++    real(dp) :: dJm_dlnT, dJm_dlnRho ! and derivatives
+ 
+-      subroutine do_test_derivs(q,dx,dy)
++    real(dp) :: Ip, Jp    ! phase space integral
++    real(dp) :: dIp_dlnT, dIp_dlnRho ! and derivatives
++    real(dp) :: dJp_dlnT, dJp_dlnRho ! and derivatives
+ 
+-         real(dp) :: beta   ! mec2 / kT
+-         real(dp) :: zeta   ! Q_n / kT
+-         real(dp) :: eta    ! chemical potential / kT
+-         real(dp) :: deta_dlnT, deta_dlnRho ! and derivs
++    integer :: k, neta
++    real(dp) :: etamin, etamax, deltaeta
++    real(dp) :: dx, dy
++    real(dp) :: q,mu,D9,T8
++    character(len=80) :: fmt
+ 
+-         real(dp) :: I, J    ! phase space integral
+-         real(dp) :: dI_dlnT, dI_dlnRho ! and derivatives
+-         real(dp) :: dJ_dlnT, dJ_dlnRho ! and derivatives
++    do k = 1, 3
+ 
+-         real(dp) :: Im, Jm    ! phase space integral
+-         real(dp) :: dIm_dlnT, dIm_dlnRho ! and derivatives
+-         real(dp) :: dJm_dlnT, dJm_dlnRho ! and derivatives
++       select case (k)
++       case (1)
++          D9 = 1
++          T8 = 1
++       case (2)
++          D9 = 1 + dx
++          T8 = 1 + dy
++       case(3)
++          D9 = 1 - dx
++          T8 = 1 - dy
++       end select
+ 
+-         real(dp) :: Ip, Jp    ! phase space integral
+-         real(dp) :: dIp_dlnT, dIp_dlnRho ! and derivatives
+-         real(dp) :: dJp_dlnT, dJp_dlnRho ! and derivatives
++       mu= 10.1 * pow_cr(D9,1d0/3d0)
++       beta = 59.3 / T8
+ 
+-         integer :: k, neta
+-         real(dp) :: etamin, etamax, deltaeta
+-         real(dp) :: dx, dy
+-         real(dp) :: q,mu,D9,T8
+-         character(len=80) :: fmt
++       zeta = q * beta
++       eta = mu * beta
++       deta_dlnRho = eta / 3.0
++       deta_dlnT = -eta
+ 
+-         do k = 1, 3
++       select case (k)
++       case(1)
+ 
+-             select case (k)
+-             case (1)
+-                  D9 = 1
+-                  T8 = 1
+-             case (2)
+-                  D9 = 1 + dx
+-                  T8 = 1 + dy
+-             case(3)
+-                  D9 = 1 - dx
+-                  T8 = 1 - dy
+-             end select
++          if (q < 0) then
++             call psi_Iec_and_Jec(beta, zeta, eta, deta_dlnT, deta_dlnRho, &
++                  I, dI_dlnT, dI_dlnRho, J, dJ_dlnT, dJ_dlnRho)
++          else
++             call psi_Iee_and_Jee(beta, zeta, eta, deta_dlnT, deta_dlnRho, &
++                  I, dI_dlnT, dI_dlnRho, J, dJ_dlnT, dJ_dlnRho)
++          end if
+ 
+-             mu= 10.1 * pow_cr(D9,1d0/3d0)
+-             beta = 59.3 / T8
++       case(2)
+ 
+-             zeta = q * beta
+-             eta = mu * beta
+-             deta_dlnRho = eta / 3.0
+-             deta_dlnT = -eta
++          if (q < 0) then
++             call psi_Iec_and_Jec(beta, zeta, eta, deta_dlnT, deta_dlnRho, &
++                  Ip, dIp_dlnT, dIp_dlnRho, Jp, dJp_dlnT, dJp_dlnRho)
++          else
++             call psi_Iee_and_Jee(beta, zeta, eta, deta_dlnT, deta_dlnRho, &
++                  Ip, dIp_dlnT, dIp_dlnRho, Jp, dJp_dlnT, dJp_dlnRho)
++          end if
++
++       case(3)
++
++          if (q < 0) then
++             call psi_Iec_and_Jec(beta, zeta, eta, deta_dlnT, deta_dlnRho, &
++                  Im, dIm_dlnT, dIm_dlnRho, Jm, dJm_dlnT, dJm_dlnRho)
++          else
++             call psi_Iee_and_Jee(beta, zeta, eta, deta_dlnT, deta_dlnRho, &
++                  Im, dIm_dlnT, dIm_dlnRho, Jm, dJm_dlnT, dJm_dlnRho)
++          end if
+ 
+-             select case (k)
+-             case(1)
++       end select
++    end do
+ 
+-                  if (q < 0) then
+-                      call psi_Iec_and_Jec(beta, zeta, eta, deta_dlnT, deta_dlnRho, &
+-                              I, dI_dlnT, dI_dlnRho, J, dJ_dlnT, dJ_dlnRho)
+-                  else
+-                      call psi_Iee_and_Jee(beta, zeta, eta, deta_dlnT, deta_dlnRho, &
+-                              I, dI_dlnT, dI_dlnRho, J, dJ_dlnT, dJ_dlnRho)
+-                  end if
++    include 'formats'
++    if (dx.ne.0) then
++       write(*,'(6X, A12, 3F12.6)') "dI_lnRho", dI_dlnRho, (Ip - Im) / (2 * dx), dI_dlnRho/(Ip - Im) * dx * 2
++       write(*,'(6X, A12, 3F12.6)') "dJ_lnRho", dJ_dlnRho, (Jp - Jm) / (2 * dx), dJ_dlnRho/(Jp - Jm) * dx * 2
++    end if
++    if (dy.ne.0) then
++       write(*,'(6X, A12, 3F12.6)') "dI_dlnT", dI_dlnT, (Ip - Im) / (2 * dy), dI_dlnT/(Ip - Im) * dy * 2
++       write(*,'(6X, A12, 3F12.6)') "dJ_dlnT", dJ_dlnT, (Jp - Jm) / (2 * dy), dJ_dlnT/(Jp - Jm) * dy * 2
++    end if
+ 
+-             case(2)
++  end subroutine do_test_derivs
+ 
+-                  if (q < 0) then
+-                      call psi_Iec_and_Jec(beta, zeta, eta, deta_dlnT, deta_dlnRho, &
+-                              Ip, dIp_dlnT, dIp_dlnRho, Jp, dJp_dlnT, dJp_dlnRho)
+-                  else
+-                      call psi_Iee_and_Jee(beta, zeta, eta, deta_dlnT, deta_dlnRho, &
+-                              Ip, dIp_dlnT, dIp_dlnRho, Jp, dJp_dlnT, dJp_dlnRho)
+-                  end if
+ 
+-             case(3)
+ 
+-                  if (q < 0) then
+-                      call psi_Iec_and_Jec(beta, zeta, eta, deta_dlnT, deta_dlnRho, &
+-                              Im, dIm_dlnT, dIm_dlnRho, Jm, dJm_dlnT, dJm_dlnRho)
+-                  else
+-                      call psi_Iee_and_Jee(beta, zeta, eta, deta_dlnT, deta_dlnRho, &
+-                              Im, dIm_dlnT, dIm_dlnRho, Jm, dJm_dlnT, dJm_dlnRho)
+-                  end if
++  subroutine do_test_coulomb
+ 
+-             end select
+-         end do
++    use mod_eval_coulomb
++    use rates_def, only: Coulomb_Info, which_mui_coulomb, which_vs_coulomb
+ 
+-         include 'formats'
+-         if (dx.ne.0) then
+-             write(*,1) "dI_lnRho", dI_dlnRho, (Ip - Im) / (2 * dx), dI_dlnRho/(Ip - Im) * dx * 2
+-             write(*,1) "dJ_lnRho", dJ_dlnRho, (Jp - Jm) / (2 * dx), dJ_dlnRho/(Jp - Jm) * dx * 2
+-         end if
+-         if (dy.ne.0) then
+-             write(*,1) "dI_dlnT", dI_dlnT, (Ip - Im) / (2 * dy), dI_dlnT/(Ip - Im) * dy * 2
+-             write(*,1) "dJ_dlnT", dJ_dlnT, (Jp - Jm) / (2 * dy), dJ_dlnT/(Jp - Jm) * dy * 2
+-         end if
++    real(dp) :: mu1, mu2, vs
++    real(dp) :: z1, z2
++    type(Coulomb_Info), pointer :: cc
+ 
+-      end subroutine do_test_derivs
++    include 'formats'
+ 
++    which_mui_coulomb = PCR2009
++    which_vs_coulomb = Itoh2002
+ 
++    z1 = 12
++    z2 = 11
+ 
+-      subroutine do_test_coulomb
++    allocate(cc)
+ 
+-         use mod_eval_coulomb
+-         use rates_def, only: Coulomb_Info
+-
+-         real(dp) :: mu1, mu2
+-         real(dp) :: z1, z2
+-         real(dp) :: log10T, T, log10Rho, Rho, abar, zbar, z2bar
+-         real(dp) :: tmp
+-         type(Coulomb_Info), pointer :: cc
+-         real(dp), dimension(3) :: a, x, y, z
+-         integer :: i
+-
+-         include 'formats'
+-
+-         log10Rho = 9.5
+-         Rho = exp10_cr(log10Rho)
+-         log10T = 8.5
+-         T = exp10_cr(log10T)
+-
+-         z1 = 12
+-         z2 = 11
+-
+-         zbar = 9.5
+-
+-         allocate(cc)
+-
+-         a = (/16d0, 20d0, 24d0/)
+-         z = (/8d0, 10d0, 12d0/)
+-         x = (/0.8d0, 0.15d0, 0.05d0/)
+-
+-         y = x/a
+-         
+-         abar = 1d0 / sum(y)
+-         zbar = sum(z*y)*abar
+-         z2bar = sum(z*z*y)*abar
+-
+-         call coulomb_set_context(cc, T, Rho, log10T, log10Rho, & 
+-              zbar, abar, z2bar, 0d0, 3, y, z)
+-
+-         mu1 = do_mui_coulomb(cc, z1)
+-         mu2 = do_mui_coulomb(cc, z2)
+-
+-         deallocate(cc)
+-
+-         write(*,1) 'do_test_coulomb', mu1, mu2, abs(mu1-mu2) * (8.617d-11) * T
++    call coulomb_set_context(cc, T, Rho, log10T, log10Rho, &
++         zbar, abar, z2bar, 0d0, species, ya, za)
+ 
+-      end subroutine do_test_coulomb
+-
+-
+-      subroutine do_test_ec
+-
+-         use const_lib
+-         use utils_lib
+-         use eos_def
+-         use eos_lib
+-         use chem_def
+-         use chem_lib
+-         use rates_def, only: Coulomb_Info
+-
+-         real(dp) :: Rho, T, Pgas, log10Rho, log10T
+-         real(dp) :: dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas, d_dlnRho_const_T, d_dlnT_const_Rho
+-         real(dp), dimension(num_eos_basic_results) :: res, d_dlnd, d_dlnT, d_dabar, d_dzbar
+-         integer :: ierr
+-
+-         integer :: i, ir, nr
+-         integer, pointer :: ids(:)
+-         type(Coulomb_Info), pointer :: cc
++    mu1 = do_mui_coulomb(cc, z1)
++    mu2 = do_mui_coulomb(cc, z2)
+ 
+-         real(dp), dimension(:), pointer :: &
+-                ldecay, d_ldecay_dT9, d_ldecay_dlYeRho, &
+-                lcapture, d_lcapture_dT9, d_lcapture_dlYeRho, &
+-                lneutrino, d_lneutrino_dT9, d_lneutrino_dlYeRho, &
+-                ec_lambda, ec_dlambda_dlnT, ec_dlambda_dlnRho, &
+-                Q, dQ_dlnT, dQ_dlnRho, &
+-                Qneu, dQneu_dlnT, dQneu_dlnRho
+-         real(dp) :: lntwo, logT, T9, dT9, dlnT, YeRho, &
+-                ye, logRho, dlogRho, eta, d_eta_dlnT, d_eta_dlnRho
+-         character(len=iso_name_length) :: weak_lhs, weak_rhs
+-         character(len=2*iso_name_length+1) :: keyp
++    vs = do_vs_coulomb(cc, z1)
+ 
+-         integer :: j,k, ND, NT
+-         real(dp), allocatable, dimension(:) :: logTpts, logDpts
+-         real(dp) :: log
++    deallocate(cc)
+ 
+-         real(dp) :: logTmin,logTmax, deltaT
+-         real(dp) :: logDmin,logDmax, deltaD
++    write(*,'(6X, A4, 3F26.16)') 'mu', mu1, mu2, abs(mu1-mu2) * kev * T
++    write(*,'(6X, A4, F26.16)') 'vs', vs
+ 
+-         real(dp), dimension(:,:,:), allocatable :: tneu, tec, &
+-                decay, capture, neutrino, &
+-                d_decay_dT9, d_decay_dlYeRho, &
+-                d_capture_dT9, d_capture_dlYeRho, &
+-                d_neutrino_dT9, d_neutrino_dlYeRho, &
+-                Q_out, Qneu_out, &
+-                lambda, dlambda_dlnT, dlambda_dlnRho
++  end subroutine do_test_coulomb
+ 
+-         real(dp), dimension(:,:), allocatable :: neucool
+ 
+-         integer, parameter :: datafile = 12
+-         character (len=32) :: outfile
+-
+-         outfile = "test_data/test-ecapture-"
+-
+-         allocate(net_iso(num_chem_isos), chem_id(species), stat=ierr)
+-         if (ierr /= 0) stop 'allocate failed'
+-         X = 0.70
+-         Z = 0.02
+-         call Init_Composition
+-
+-         nr = 8
+-
+-         allocate( &
+-                ids(nr), ldecay(nr), d_ldecay_dT9(nr), d_ldecay_dlYeRho(nr), &
+-                lcapture(nr), d_lcapture_dT9(nr), d_lcapture_dlYeRho(nr), &
+-                lneutrino(nr), d_lneutrino_dT9(nr), d_lneutrino_dlYeRho(nr), &
+-                ec_lambda(nr), ec_dlambda_dlnT(nr), ec_dlambda_dlnRho(nr), &
+-                Q(nr), dQ_dlnT(nr), dQ_dlnRho(nr), &
+-                Qneu(nr), dQneu_dlnT(nr), dQneu_dlnRho(nr), &
+-                stat=ierr)
+-
+-
+-         ! pick reactions
+-         ids(1) =   get_weak_rate_id('mg24','na24')
+-         ids(2) =   get_weak_rate_id('na24','mg24')
+-         ids(3) =   get_weak_rate_id('na24','ne24')
+-         ids(4) =   get_weak_rate_id('ne24','na24')
+-         ids(5) =   get_weak_rate_id('ne20','f20')
+-         ids(6) =   get_weak_rate_id('f20','ne20')
+-         ids(7) =   get_weak_rate_id('f20','o20')
+-         ids(8) =   get_weak_rate_id('o20','f20')
+-
+-         write(*,'(8i12)') ids
+-
+-         ! ids(1) =   get_weak_rate_id('ne20','f20')
+-         ! ids(2) =   get_weak_rate_id('f20','ne20')
+-
+-         ! now loop over temperature and density
+-         !fill in arrays
+-         ND = 121; logDmin = 8.0; logDmax = 11.0
+-         NT = 121; logTmin = 7.0; logTmax = 10.0
+-
+-         !             write(*,*) 'NT', NT, 'Tmin', logTmin, 'Tmax', logTmax
+-         !             write(*,*) 'ND', ND, 'Dmin', logDmin, 'Dmax', logDmax
+-
+-         deltaT = (logTmax - logTmin) / real(NT-1,8)
+-         deltaD = (logDmax - logDmin) / real(ND-1,8)
+-
+-         allocate(logTpts(NT))
+-         logTpts(1) = logTmin
+-         do j=2,NT
+-             logTpts(j) = logTpts(j-1) + deltaT
+-         end do
+-
+-         allocate(logDpts(ND))
+-         logDpts(1) = logDmin
+-         do j=2,ND
+-             logDpts(j) = logDpts(j-1) + deltaD
+-         end do
+-
+-         allocate(lambda(nr,NT,ND))
+-         allocate(dlambda_dlnRho(nr,NT,ND))
+-         allocate(dlambda_dlnT(nr,NT,ND))
+-
+-         allocate(Q_out(nr,NT,ND))
+-         allocate(Qneu_out(nr,NT,ND))
+-
+-         do j = 1, NT
+-             do k = 1, ND
+-
+-
+-                  logT = logTpts(j)
+-                  logRho = logDpts(k)
+-                  Ye = 0.5d0
+-
+-                  T = exp10_cr(logT)
+-                  T9 = T*1d-9
+-                  rho = exp10_cr(logRho)
+-                  YeRho = Ye*rho
+-
+-                  ! get a set of results for given temperature and density
+-                  call eosDT_get( &
+-                         handle, Z, X, abar, zbar,   &
+-                         species, chem_id, net_iso, xa, &
+-                         Rho, logRho, T, logT,   &
+-                         res, d_dlnd, d_dlnT, d_dabar, d_dzbar, ierr)
+-
+-
+-
+-                  eta = res(i_eta)
+-                  d_eta_dlnT = d_dlnT(i_eta)
+-                  d_eta_dlnRho = d_dlnd(i_eta)
+-
+-
+-                  ec_lambda = 1
+-                  if (do_ecapture) then
+-                      call eval_ecapture_reaction_info( &
+-                              nr, ids, cc, T9, YeRho, zbar, &
+-                              eta, d_eta_dlnT, d_eta_dlnRho, &
+-                              ldecay, d_ldecay_dT9, d_ldecay_dlYeRho, &
+-                              lcapture, d_lcapture_dT9, d_lcapture_dlYeRho, &
+-                              lneutrino, d_lneutrino_dT9, d_lneutrino_dlYeRho, &
+-                              ec_lambda, ec_dlambda_dlnT, ec_dlambda_dlnRho, &
+-                              Q, dQ_dlnT, dQ_dlnRho, &
+-                              Qneu, dQneu_dlnT, dQneu_dlnRho, &
+-                              ierr)
+-                  else
+-                      call eval_weak_reaction_info( &
+-                              nr, ids, cc, T9, YeRho, -1d0, &
+-                              eta, d_eta_dlnT, d_eta_dlnRho, &
+-                              ldecay, d_ldecay_dT9, d_ldecay_dlYeRho, &
+-                              lcapture, d_lcapture_dT9, d_lcapture_dlYeRho, &
+-                              lneutrino, d_lneutrino_dT9, d_lneutrino_dlYeRho, &
+-                              ec_lambda, ec_dlambda_dlnT, ec_dlambda_dlnRho, &
+-                              Q, dQ_dlnT, dQ_dlnRho, &
+-                              Qneu, dQneu_dlnT, dQneu_dlnRho, &
+-                              ierr)
+-                  end if
+-
+-
+-                  if (ierr /= 0) then
+-                      write(*,*) 'failed in eval_ecapture_reaction_info'
+-                      stop 1
+-                  end if
+-
+-
+-                  ! pull out the data
+-
+-                  lambda(1:nr,j,k) = ec_lambda(1:nr)
+-                  dlambda_dlnRho(1:nr,j,k) = ec_dlambda_dlnRho(1:nr)
+-                  dlambda_dlnT(1:nr,j,k) = ec_dlambda_dlnT(1:nr)
+-                  Q_out(1:nr,j,k) = Q(1:nr)
+-                  Qneu_out(1:nr,j,k) = Qneu(1:nr)
+-
+-             end do
+-         end do
+-
+-
+-         do i = 1, nr
+-
+-             write(*,*) trim(outfile), trim(weak_lhs_nuclide_name(ids(i))), trim(weak_rhs_nuclide_name(ids(i)))
+-             open(unit=datafile, file=trim(outfile) // &
+-                     trim(weak_lhs_nuclide_name(ids(i))) // trim(weak_rhs_nuclide_name(ids(i))))
+-             write(datafile, "(2I6)") NT,ND
+-             write(datafile, "(999ES12.4)") logTpts
+-             write(datafile, "(999ES12.4)") logDpts
+-
+-             do k = 1, ND
+-                  do j = 1, NT
+-                      write(datafile,"(ES12.4)",advance='no') safe_log10_cr(lambda(i,j,k))
+-                  end do
+-                  write(datafile,*)
+-             end do
+-
+-             do k = 1, ND
+-                  do j = 1, NT
+-                      write(datafile,"(ES12.4)",advance='no') safe_log10_cr(dlambda_dlnT(i,j,k))
+-                  end do
+-                  write(datafile,*)
+-             end do
+-
+-             do k = 1, ND
+-                  do j = 1, NT
+-                      write(datafile,"(ES12.4)",advance='no') safe_log10_cr(dlambda_dlnRho(i,j,k))
+-                  end do
+-                  write(datafile,*)
+-             end do
+-             ! end do
+-
+-             do k = 1, ND
+-                  do j = 1, NT
+-                      write(datafile,"(ES12.4)",advance='no') Q_out(i,j,k)
+-                  end do
+-                  write(datafile,*)
+-             end do
+-
+-             do k = 1, ND
+-                  do j = 1, NT
+-                      write(datafile,"(ES12.4)",advance='no') Qneu_out(i,j,k)
+-                  end do
+-                  write(datafile,*)
+-             end do
+-
+-             close(datafile)
+-
+-         end do
+-
+-         ! deallocate the eos tables
+-         call free_eos_handle(handle)
+-         call eos_shutdown
+-
+-         deallocate(net_iso, chem_id)
+-
+-         if (ierr /= 0) then
+-             write(*,*) 'bad result from eos_get'
+-             stop 1
+-         end if
+-
+-
+-         deallocate( &
+-                ids, ldecay, d_ldecay_dT9, d_ldecay_dlYeRho, &
+-                lcapture, d_lcapture_dT9, d_lcapture_dlYeRho, &
+-                lneutrino, d_lneutrino_dT9, d_lneutrino_dlYeRho, &
+-                lambda, dlambda_dlnT, dlambda_dlnRho, &
+-                Q, dQ_dlnT, dQ_dlnRho, &
+-                Qneu, dQneu_dlnT, dQneu_dlnRho)
++  subroutine do_test_special_weak(use_special)
+ 
++    use const_lib
++    use utils_lib
++    use eos_def
++    use eos_lib
++    use chem_def
++    use chem_lib
++    use rates_def, only: Coulomb_Info
++    use mod_eval_coulomb
+ 
+-         close(datafile)
++    logical, intent(in) :: use_special
+ 
+-      end subroutine do_test_ec
++    real(dp) :: Rho, T, Pgas, log10Rho, log10T
++    real(dp) :: dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas, d_dlnRho_const_T, d_dlnT_const_Rho
++    real(dp), dimension(num_eos_basic_results) :: res, d_dlnd, d_dlnT, d_dabar, d_dzbar
++    integer :: ierr
+ 
+-      subroutine Init_Composition
+-         use chem_def
+-         use chem_lib
++    integer :: i, ir, nr
++    integer, pointer :: ids(:)
++    type(Coulomb_Info), pointer :: cc
+ 
+-         real(dp), parameter :: Zfrac_C = 0.173312d0
+-         real(dp), parameter :: Zfrac_N = 0.053177d0
+-         real(dp), parameter :: Zfrac_O = 0.482398d0
+-         real(dp), parameter :: Zfrac_Ne = 0.098675d0
++    real(dp), dimension(:), pointer :: &
++         ldecay, d_ldecay_dT9, d_ldecay_dlYeRho, &
++         lcapture, d_lcapture_dT9, d_lcapture_dlYeRho, &
++         lneutrino, d_lneutrino_dT9, d_lneutrino_dlYeRho, &
++         lambda, dlambda_dlnT, dlambda_dlnRho, &
++         Q, dQ_dlnT, dQ_dlnRho, &
++         Qneu, dQneu_dlnT, dQneu_dlnRho
++    real(dp) :: lntwo, logT, T9, dT9, dlnT, YeRho, &
++         ye, logRho, dlogRho, eta, d_eta_dlnT, d_eta_dlnRho
++    character(len=iso_name_length), dimension(8) :: weak_lhs, weak_rhs
+ 
+-         real(dp) :: frac, dabar_dx(species), dzbar_dx(species),   &
+-                sumx, xh, xhe, mass_correction, dmc_dx(species)
++    allocate(cc)
+ 
+-         net_iso(:) = 0
++    nr = 8
+ 
+-         chem_id(h1) = ih1; net_iso(ih1) = h1
+-         chem_id(he4) = ihe4; net_iso(ihe4) = he4
+-         chem_id(c12) = ic12; net_iso(ic12) = c12
+-         chem_id(n14) = in14; net_iso(in14) = n14
+-         chem_id(o16) = io16; net_iso(io16) = o16
+-         chem_id(ne20) = ine20; net_iso(ine20) = ne20
+-         chem_id(mg24) = img24; net_iso(img24) = mg24
++    allocate( &
++         ids(nr), ldecay(nr), d_ldecay_dT9(nr), d_ldecay_dlYeRho(nr), &
++         lcapture(nr), d_lcapture_dT9(nr), d_lcapture_dlYeRho(nr), &
++         lneutrino(nr), d_lneutrino_dT9(nr), d_lneutrino_dlYeRho(nr), &
++         lambda(nr), dlambda_dlnT(nr), dlambda_dlnRho(nr), &
++         Q(nr), dQ_dlnT(nr), dQ_dlnRho(nr), &
++         Qneu(nr), dQneu_dlnT(nr), dQneu_dlnRho(nr), &
++         stat=ierr)
+ 
+ 
+-         xa(h1) = 0
+-         xa(he4) = 0
+-         xa(c12) = 0
+-         xa(n14) = 0
+-         xa(o16) = 0.0
+-         xa(ne20) = 1.0
+-         xa(mg24) = 0.0
+-
+-         call composition_info( &
+-                species, chem_id, xa, xh, xhe, abar, zbar, z2bar, ye,   &
+-                mass_correction, sumx, dabar_dx, dzbar_dx, dmc_dx)
++    ! pick reactions
++    weak_lhs(1) = 'mg24'
++    weak_rhs(1) = 'na24'
+ 
+-      end subroutine Init_Composition
++    weak_lhs(2) = 'na24'
++    weak_rhs(2) = 'mg24'
+ 
++    weak_lhs(3) = 'na24'
++    weak_rhs(3) = 'ne24'
+ 
+-      subroutine Setup_eos(handle)
+-         ! allocate and load the eos tables
+-         use eos_def
+-         use eos_lib
+-         integer, intent(out) :: handle
++    weak_lhs(4) = 'ne24'
++    weak_rhs(4) = 'na24'
+ 
+-         character (len=256) :: eos_file_prefix
+-         integer :: ierr
+-         logical, parameter :: use_cache = .true.
++    weak_lhs(5) = 'ne20'
++    weak_rhs(5) = 'f20'
+ 
+-         eos_file_prefix = 'mesa'
++    weak_lhs(6) = 'f20'
++    weak_rhs(6) = 'ne20'
+ 
+-         call eos_init(eos_file_prefix, '', '', use_cache, ierr)
+-         if (ierr /= 0) then
+-             write(*,*) 'eos_init failed in Setup_eos'
+-             stop 1
+-         end if
++    weak_lhs(7) = 'f20'
++    weak_rhs(7) = 'o20'
+ 
+-         handle = alloc_eos_handle(ierr)
+-         if (ierr /= 0) then
+-             write(*,*) 'failed trying to allocate eos handle'
+-             stop 1
+-         end if
++    weak_lhs(8) = 'o20'
++    weak_rhs(8) = 'f20'
+ 
+-      end subroutine Setup_eos
++    do i = 1, 8
++       ids(i) = get_weak_rate_id(weak_lhs(i), weak_rhs(i))
++    enddo
+ 
++    logT = 8.3d0
++    logRho = 9.8d0
++    Ye = 0.5d0
++
++    T = exp10_cr(logT)
++    T9 = T*1d-9
++    rho = exp10_cr(logRho)
++    YeRho = Ye*rho
++
++    ! get a set of results for given temperature and density
++    call eosDT_get( &
++         handle, Z, X, abar, zbar,   &
++         species, chem_id, net_iso, xa, &
++         Rho, logRho, T, logT,   &
++         res, d_dlnd, d_dlnT, d_dabar, d_dzbar, ierr)
++
++    call coulomb_set_context(cc, T, Rho, log10T, log10Rho, &
++         zbar, abar, z2bar, 0d0, species, ya, za)
++
++    eta = res(i_eta)
++    d_eta_dlnT = d_dlnT(i_eta)
++    d_eta_dlnRho = d_dlnd(i_eta)
++
++
++    if (use_special) then
++
++       do_ecapture = .true.
++       which_mui_coulomb = PCR2009
++       which_vs_coulomb = Itoh2002
++
++       call eval_ecapture_reaction_info( &
++            nr, ids, cc, T9, YeRho, zbar, &
++            eta, d_eta_dlnT, d_eta_dlnRho, &
++            ldecay, d_ldecay_dT9, d_ldecay_dlYeRho, &
++            lcapture, d_lcapture_dT9, d_lcapture_dlYeRho, &
++            lneutrino, d_lneutrino_dT9, d_lneutrino_dlYeRho, &
++            lambda, dlambda_dlnT, dlambda_dlnRho, &
++            Q, dQ_dlnT, dQ_dlnRho, &
++            Qneu, dQneu_dlnT, dQneu_dlnRho, &
++            ierr)
++
++       write(*,*) "special weak rates"
++    else
++       do_ecapture = .false.
++       call eval_weak_reaction_info( &
++            nr, ids, cc, T9, YeRho, -1d0, &
++            eta, d_eta_dlnT, d_eta_dlnRho, &
++            ldecay, d_ldecay_dT9, d_ldecay_dlYeRho, &
++            lcapture, d_lcapture_dT9, d_lcapture_dlYeRho, &
++            lneutrino, d_lneutrino_dT9, d_lneutrino_dlYeRho, &
++            lambda, dlambda_dlnT, dlambda_dlnRho, &
++            Q, dQ_dlnT, dQ_dlnRho, &
++            Qneu, dQneu_dlnT, dQneu_dlnRho, &
++            ierr)
++
++       write(*,*) "weaklib weak rates"
+ 
+-   end module test_ecapture
++    end if
++
++    do i = 1, nr
++       write(*,'(6X, 2A6, ES26.16)') weak_lhs(i), weak_rhs(i), lambda(i)
++    enddo
++    write(*,*)
++
++    deallocate( &
++         ids, ldecay, d_ldecay_dT9, d_ldecay_dlYeRho, &
++         lcapture, d_lcapture_dT9, d_lcapture_dlYeRho, &
++         lneutrino, d_lneutrino_dT9, d_lneutrino_dlYeRho, &
++         lambda, dlambda_dlnT, dlambda_dlnRho, &
++         Q, dQ_dlnT, dQ_dlnRho, &
++         Qneu, dQneu_dlnT, dQneu_dlnRho)
++
++
++  end subroutine do_test_special_weak
++
++  subroutine Init_Composition
++    use chem_def
++    use chem_lib
++
++    real(dp) :: frac, dabar_dx(species), dzbar_dx(species),   &
++         sumx, xh, xhe, mass_correction, dmc_dx(species)
++
++    allocate(net_iso(num_chem_isos), chem_id(species), stat=ierr)
++    if (ierr /= 0) stop 'allocate failed'
++    X = 0.70
++    Z = 0.02
++
++    net_iso(:) = 0
++
++    chem_id(h1) = ih1; net_iso(ih1) = h1
++    chem_id(he4) = ihe4; net_iso(ihe4) = he4
++    chem_id(c12) = ic12; net_iso(ic12) = c12
++    chem_id(n14) = in14; net_iso(in14) = n14
++    chem_id(o16) = io16; net_iso(io16) = o16
++    chem_id(ne20) = ine20; net_iso(ine20) = ne20
++    chem_id(mg24) = img24; net_iso(img24) = mg24
++
++    xa(h1) = 0
++    xa(he4) = 0
++    xa(c12) = 0
++    xa(n14) = 0
++    xa(o16) = 0.0
++    xa(ne20) = 0.5
++    xa(mg24) = 0.5
++
++    do i = 1, species
++       za(i) = chem_isos% Z(chem_id(i))
++       aa(i) = chem_isos% W(chem_id(i))
++       ya(i) = xa(i) / aa(i)
++    enddo
++
++    call composition_info( &
++         species, chem_id, xa, xh, xhe, abar, zbar, z2bar, ye,   &
++         mass_correction, sumx, dabar_dx, dzbar_dx, dmc_dx)
++
++  end subroutine Init_Composition
++
++
++  subroutine Setup_eos(handle)
++    ! allocate and load the eos tables
++    use eos_def
++    use eos_lib
++    integer, intent(out) :: handle
++
++    character (len=256) :: eos_file_prefix
++    integer :: ierr
++    logical, parameter :: use_cache = .true.
++
++    eos_file_prefix = 'mesa'
++
++    call eos_init(eos_file_prefix, '', '', use_cache, ierr)
++    if (ierr /= 0) then
++       write(*,*) 'eos_init failed in Setup_eos'
++       stop 1
++    end if
++
++    handle = alloc_eos_handle(ierr)
++    if (ierr /= 0) then
++       write(*,*) 'failed trying to allocate eos handle'
++       stop 1
++    end if
++
++  end subroutine Setup_eos
++
++
++end module test_ecapture
+diff --git a/rates/test/test_output b/rates/test/test_output
+index 6bce8f7..a92f2e1 100644
+--- a/rates/test/test_output
++++ b/rates/test/test_output
+@@ -313,15 +313,48 @@
+               al26-2  mg26        6.350757E+00    1.894917E+00    5.008143E+00
+ 
+  done
+-                                               dI_lnRho    3.7679293734665111D+00    3.7691977614220140D+00    9.9966348596285270D-01
+-                                               dJ_lnRho    4.4201928604230567D-01    4.4240520013381651D-01    9.9912769087842068D-01
+-                                                dI_dlnT    1.9373735311238288D-02    1.9373735534611997D-02    9.9999998847028193D-01
+-                                                dJ_dlnT    3.2781558108278090D-03    3.2781561967246131D-03    9.9999988228236214D-01
+-                                               dI_lnRho   -5.0356230185759105D-04   -5.0694114720015832D-04    9.9333483706890091D-01
+-                                               dJ_lnRho   -2.5397575290037014D-05   -2.5568160594612932D-05    9.9332821366070978D-01
+-                                                dI_dlnT    2.2501186547048283D-05    2.2501335004339001D-05    9.9999340228965572D-01
+-                                                dJ_dlnT    1.2616049392764916D-06    1.2616165290441114D-06    9.9999081355756447D-01
+-                                        do_test_coulomb   -5.8283567975662045D+01   -5.0642757629817289D+01    2.0820708940099292D-01
++
++ do_test_derivs
++          dI_lnRho    3.767929    3.769198    0.999663
++          dJ_lnRho    0.442019    0.442405    0.999128
++           dI_dlnT    0.019374    0.019374    1.000000
++           dJ_dlnT    0.003278    0.003278    1.000000
++          dI_lnRho   -0.000504   -0.000507    0.993335
++          dJ_lnRho   -0.000025   -0.000026    0.993328
++           dI_dlnT    0.000023    0.000023    0.999993
++           dJ_dlnT    0.000001    0.000001    0.999991
++ done
++
++
++ do_test_coulomb
++        mu      -43.7453057908254479      -37.5095742103220076   169927.2029863286879845
++        vs        0.0079074259098304
++ done
++
++
++ do_test_special_weak
++ weaklib weak rates
++      mg24  na24      1.4421196430012362E-20
++      na24  mg24      2.3600313369528947E-58
++      na24  ne24      1.9110331699588059E-07
++      ne24  na24      6.3096907496076244E-88
++      ne20  f20       5.0241239787014306E-34
++      f20   ne20      1.2808900137670006E-50
++      f20   o20       1.0039357281556831E-14
++      o20   f20       3.6919633091994286E-73
++
++ special weak rates
++      mg24  na24      2.1458836733674090E-03
++      na24  mg24      9.3639642238414640E-40
++      na24  ne24      9.1049154411572113E-06
++      ne24  na24      7.0497133465403066-118
++      ne20  f20       1.1057990325212887E-38
++      f20   ne20      3.1758766783951057E-29
++      f20   o20       2.6131865953939702E-03
++      o20   f20       2.2230200225531789E-84
++
++ done
++
+ 
+  do_test_rates           1
+                                                    logT    9.0000000000000000D+00
+-- 
+2.5.0
+

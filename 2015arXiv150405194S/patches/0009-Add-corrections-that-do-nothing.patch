@@ -1,0 +1,52 @@
+From bda8fc126c384d5096075d9480ece895f415f640 Mon Sep 17 00:00:00 2001
+From: Josiah Schwab <jschwab@gmail.com>
+Date: Wed, 23 Jul 2014 13:33:17 -0700
+Subject: [PATCH 09/12] Add corrections that do nothing
+
+---
+ rates/private/eval_coulomb.f | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/rates/private/eval_coulomb.f b/rates/private/eval_coulomb.f
+index 32fb58f..22e3e35 100644
+--- a/rates/private/eval_coulomb.f
++++ b/rates/private/eval_coulomb.f
+@@ -30,13 +30,15 @@ module mod_eval_coulomb
+ 
+   implicit none
+ 
+-  ! will add other approaches in the future
++  integer, parameter :: None = 0
++
++  ! select the option for the ion chemical potential
+   integer, parameter :: DGC1973 = 1
+   integer, parameter :: I1993 = 2
+   integer, parameter :: PCR2009 = 3
+   integer :: which_mui_coulomb = 1
+ 
+-  ! select the option for the screening
++  ! select the option for the electron screening
+   integer, parameter :: ThomasFermi = 1
+   integer, parameter :: Itoh2002 = 2
+   integer :: which_vs_coulomb = 1
+@@ -58,6 +60,8 @@ contains
+     real(dp) :: mu ! the chemical potential in units of kT
+ 
+     select case (which_mui_coulomb)
++    case (None)
++       mu = 0
+     case (DGC1973)
+        mu = mui_coulomb_DGC1973(cc, Z)
+     case (I1993)
+@@ -302,6 +306,8 @@ contains
+     real(dp) :: Vs ! the screening potential in units of the fermi energy
+ 
+     select case (which_Vs_coulomb)
++    case (None)
++       Vs = 0
+     case (ThomasFermi)
+        Vs = Vs_coulomb_TF(cc, Z)
+     case (Itoh2002)
+-- 
+2.5.0
+

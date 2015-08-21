@@ -1,0 +1,84 @@
+From 6f5414acdbe1464b830aedb1a563dbdae1854174 Mon Sep 17 00:00:00 2001
+From: Josiah Schwab <jschwab@gmail.com>
+Date: Fri, 18 Jul 2014 14:45:47 -0700
+Subject: [PATCH 05/12] Add corrections used by Juodagalvis
+
+This adds an option to use the same expression for the ion chemical
+potential as used by Juodagalvis et al. (2010).
+---
+ rates/private/eval_coulomb.f | 45 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 45 insertions(+)
+
+diff --git a/rates/private/eval_coulomb.f b/rates/private/eval_coulomb.f
+index d92b47d..5d3bbca 100644
+--- a/rates/private/eval_coulomb.f
++++ b/rates/private/eval_coulomb.f
+@@ -32,6 +32,7 @@ module mod_eval_coulomb
+ 
+   ! will add other approaches in the future
+   integer, parameter :: DGC1973 = 1
++  integer, parameter :: I1993 = 2
+   integer :: which_mui_coulomb = 1
+ 
+   ! select the option for the screening
+@@ -58,6 +59,8 @@ contains
+     select case (which_mui_coulomb)
+     case (DGC1973)
+        mu = mui_coulomb_DGC1973(cc, Z)
++    case (I1993)
++       mu = mui_coulomb_I1993(cc, Z)
+     case default
+        stop "STOP (eval_coulomb.f: do_mui_coulomb): incorrect value of which_mui_coulomb"
+     end select
+@@ -116,6 +119,48 @@ contains
+   end function mui_coulomb_DGC1973
+ 
+ 
++  function mui_coulomb_I1993(cc, Z) result(mu)
++    use crlibm_lib
++    use rates_def, only: Coulomb_Info
++
++    implicit none
++
++    type(Coulomb_Info), intent(in) :: cc
++    real(dp), intent(in) :: Z ! nuclear charge
++
++    real(dp) :: mu ! the chemical potential in units of kT
++
++    ! calulate the chemical potential of an ion
++
++    ! form from W.L. Slattery, G.D. Doolen, H.E. DeWitt, Phys. Rev. A 26 (1982) 2255.
++    ! values from Ichimaru, S. 1993, Reviews of Modern Physics, 65, 255
++    ! via Juodagalvis et al. (2010)
++
++    real(dp) :: gamma, gamma14
++
++    ! define parameters
++    real(dp), parameter :: a = -0.898004
++    real(dp), parameter :: b = 0.96786
++    real(dp), parameter :: c = 0.220703
++    real(dp), parameter :: d = -0.86097
++    real(dp), parameter :: e = -2.52692
++
++    logical :: debug = .false.
++
++    ! coulomb coupling parameter
++    gamma = 2.275e5_dp * pow_cr(Z,5d0/3d0) * pow_cr(cc% den * cc% ye, 1d0/3d0) * cc% tempi
++    if (debug) write(*,'(a,4(ES12.3))') "gamma = ", gamma, cc% den, cc% ye, cc% temp
++
++    ! ratios for convenience
++    gamma14 = pow_cr(gamma, 1d0/4d0)
++
++    mu = a * gamma + 4d0 * b * gamma14  - 4d0 * c / gamma14 + d * log_cr(gamma) + e
++
++    return
++
++  end function mui_coulomb_I1993
++
++
+ #ifdef use_mic
+       !dir$ attributes offload: mic :: do_Vs_coulomb
+ #endif
+-- 
+2.5.0
+
