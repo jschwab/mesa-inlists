@@ -2,11 +2,11 @@
 This repository contains the inlists, models, and other information
 from my papers using MESA.  There is one folder per paper, named by
 the ADS bibcode of the paper.
-** 2015arXiv150405194S
-[[http://adsabs.harvard.edu/abs/2015arXiv150405194S][Schwab et al. (2015)]]
-
-Thermal Runaway During the Evolution of ONeMg Cores towards Accretion-Induced Collapse
 ** 2015arXiv150603146P
 [[http://adsabs.harvard.edu/abs/2015arXiv150603146P][Paxton et al. (2015)]]
 
 Modules for Experiments in Stellar Astrophysics (MESA): Binaries, Pulsations, and Explosions
+** 2015MNRAS.453.1910S
+[[http://adsabs.harvard.edu/abs/2015MNRAS.453.1910S][Schwab et al. (2015)]]
+
+Thermal Runaway During the Evolution of ONeMg Cores towards Accretion-Induced Collapse
