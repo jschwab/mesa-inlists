@@ -10,3 +10,7 @@ Modules for Experiments in Stellar Astrophysics (MESA): Binaries, Pulsations, an
 [[http://adsabs.harvard.edu/abs/2015MNRAS.453.1910S][Schwab et al. (2015)]]
 
 Thermal Runaway During the Evolution of ONeMg Cores towards Accretion-Induced Collapse
+** 2016arXiv160602300S
+[[http://adsabs.harvard.edu/abs/2016arXiv160602300S][Schwab et al. (2016)]]
+
+The Evolution and Fate of Super-Chandrasekhar Mass White Dwarf Merger Remnants
