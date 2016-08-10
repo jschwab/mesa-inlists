@@ -1,0 +1,64 @@
+&star_job
+  show_log_description_at_start = .false.
+
+  load_saved_model = .true.
+
+  save_model_when_terminate = .true.
+
+  eos_file_prefix = 'mesa'
+  kappa_file_prefix = 'gs98'
+
+  ! this should be below the actual blend
+  kappa_blend_logT_lower_bdy = 3.75d0
+  kappa_blend_logT_upper_bdy = 3.80d0
+
+  kappa_type2_logT_lower_bdy = 3.35d0
+
+  change_net = .true.
+  ! new_net_name = 'sagb_NeNa_MgAl.net'
+  new_net_name = 'approx21.net'
+
+  set_initial_model_number = .true.
+  initial_model_number = 0
+
+  set_initial_age = .true.
+  initial_age = 0 ! in years
+
+  pgstar_flag = .false.
+
+/ ! end of star_job namelist
+
+&controls
+
+  use_Type2_opacities = .true.
+  Zbase = 0.02
+
+  ! MLT++ helps avoid issues in the envelope
+  okay_to_reduce_gradT_excess = .false.
+
+  ! relax varcontrol a bit
+  varcontrol_target = 1e-3
+
+  ! extra resolution around flame
+  mesh_dlog_burn_c_dlogP_extra = 0.10
+  mesh_dlog_cc_dlogP_extra = 0.10
+  mesh_dlog_co_dlogP_extra = 0.10
+  mesh_dlog_oo_dlogP_extra = 0.10
+
+  mesh_dlog_burn_o_dlogP_extra = 0.10
+  mesh_dlog_burn_ne_dlogP_extra = 0.10
+
+  ! stop when the flame reaches the center
+  xa_central_lower_limit_species(1) = 'ne20'
+  xa_central_lower_limit(1) = 0.1
+
+  terminal_interval = 100
+  history_interval = 10
+  profile_interval = 25000
+  max_num_profile_models = 500
+  photostep = 25000
+
+  ! halt at neon burning
+  x_logical_ctrl(1) = .false.
+
+/ ! end of controls namelist

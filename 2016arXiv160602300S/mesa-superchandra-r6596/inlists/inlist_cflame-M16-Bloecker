@@ -1,0 +1,23 @@
+&star_job
+  saved_model_name = 'models/M16-start.mod'
+  save_model_filename = 'models/M16-cflame-Bloecker-reached-center.mod'
+/ ! end of star_job namelist
+
+&controls
+
+  ! turn on bloecker wind
+  RGB_wind_scheme = '' ! empty string means no RGB wind
+  AGB_wind_scheme = 'Blocker' ! empty string means no AGB wind
+  RGB_to_AGB_wind_switch = 1d-4
+
+  ! Blocker's mass loss for AGB stars
+  ! T. Blocker, "Stellar evolution of low and intermediate-mass stars", A&A 297, 727-738 (1995).
+  ! parameter for mass loss by Blocker's wind prescription.
+  ! Blocker mdot is eta*4.83d-9*M**-2.1*L**2.7*4d-13*L*R/M (Msun/year),
+  ! with L, R, and M in solar units.
+
+  Blocker_wind_eta = 0.1d0
+
+  log_directory = 'mesa_output/M16-cflame-Bloecker'
+  photo_directory = 'mesa_output/M16-cflame-Bloecker'
+/ ! end of controls namelist

@@ -1,0 +1,20 @@
+&star_job
+  saved_model_name = 'models/M15-cflame-Bloecker-reached-center.mod'
+  save_model_filename = 'models/M15-Bloecker-end.mod'
+/ ! end of star_job namelist
+
+&controls
+  log_directory = 'mesa_output/M15-kh-Bloecker'
+  photo_directory = 'mesa_output/M15-kh-Bloecker'
+
+  ! reduce opacities to get center to evolve
+  ! don't care about outside anyways
+  opacity_factor = 0.3
+  min_logT_for_opacity_factor_off = 3.0
+  min_logT_for_opacity_factor_on = 3.5
+  max_logT_for_opacity_factor_on = 6.5
+  max_logT_for_opacity_factor_off = 7.0
+
+  log_max_temp_lower_limit = 7.75
+
+/ ! end of controls namelist

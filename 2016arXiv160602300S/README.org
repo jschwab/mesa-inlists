@@ -1,3 +1,13 @@
+* mesa-superchandra-r6596
+This is the inlists and machinery used for the calculations of models
+M15 and M16 shown throughout the paper. (It's basically my MESA work
+directory, but without the boilerplate files.)
+
+The script ~run_model.sh~ will run all 4 phases of model M15 (cflame,
+kh, neflame, khNe).  Be warned, it'll take a few months (all spent in
+neflame).  The ~models~ directory has the starting models and some of
+the intermediate results.
+
 * find-critical-mass
 This is the inlists and machinery used to find the critical ignition
 mass as discussed in Appendix C.  (It's basically my MESA work

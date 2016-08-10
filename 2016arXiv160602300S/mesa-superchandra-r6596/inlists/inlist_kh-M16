@@ -1,0 +1,9 @@
+&star_job
+  saved_model_name = 'models/M16-cflame-reached-center.mod'
+  save_model_filename = 'models/M16-off-center-ne-ignition.mod'
+/ ! end of star_job namelist
+
+&controls
+  log_directory = 'mesa_output/M16-kh'
+  photo_directory = 'mesa_output/M16-kh'
+/ ! end of controls namelist

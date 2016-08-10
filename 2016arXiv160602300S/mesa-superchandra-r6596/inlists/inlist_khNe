@@ -1,0 +1,67 @@
+&star_job
+  show_log_description_at_start = .false.
+
+  load_saved_model = .true.
+
+  save_model_when_terminate = .true.
+
+  eos_file_prefix = 'mesa'
+  kappa_file_prefix = 'gs98'
+
+  ! this should be below the actual blend
+  kappa_blend_logT_lower_bdy = 3.75d0
+  kappa_blend_logT_upper_bdy = 3.80d0
+
+  kappa_type2_logT_lower_bdy = 3.35d0
+
+  change_net = .true.
+  ! new_net_name = 'sagb_NeNa_MgAl.net'
+  new_net_name = 'approx21.net'
+
+  set_initial_model_number = .true.
+  initial_model_number = 0
+
+  set_initial_age = .true.
+  initial_age = 0 ! in years
+
+  pgstar_flag = .false.
+
+/ ! end of star_job namelist
+
+&controls
+
+  use_Type2_opacities = .true.
+  Zbase = 0.02
+
+  ! MLT++ helps avoid issues in the envelope
+  okay_to_reduce_gradT_excess = .false.
+
+  ! relax varcontrol a bit
+  ! varcontrol_target = 1e-3
+
+  ! extra resolution around carbon flame
+  mesh_dlog_burn_c_dlogP_extra = 0.10
+  mesh_dlog_cc_dlogP_extra = 0.10
+  mesh_dlog_co_dlogP_extra = 0.10
+  mesh_dlog_oo_dlogP_extra = 0.10
+
+  ! add extra res at o/ne and si burn too
+  mesh_dlog_burn_o_dlogP_extra = 0.10
+  mesh_dlog_burn_ne_dlogP_extra = 0.10
+  mesh_dlog_burn_si_dlogP_extra = 0.10
+
+  ! don't let center change too much between dumps
+  delta_lgRho_cntr_limit = 0.003
+
+  terminal_interval = 10
+  history_interval = 1
+  profile_interval = 10
+  max_num_profile_models = 1000
+  photostep = 1000
+
+  ! halt at silicon burning
+  x_logical_ctrl(1) = .false.
+  x_logical_ctrl(2) = .false.
+  max_model_number = 3000 ! si burning has started by this time
+
+/ ! end of controls namelist

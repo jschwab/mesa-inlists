@@ -1,0 +1,9 @@
+&star_job
+  saved_model_name = 'models/M15-start.mod'
+  save_model_filename = 'models/M15-cflame-reached-center.mod'
+/ ! end of star_job namelist
+
+&controls
+  log_directory = 'mesa_output/M15-cflame'
+  photo_directory = 'mesa_output/M15-cflame'
+/ ! end of controls namelist
