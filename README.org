@@ -6,10 +6,14 @@ the ADS bibcode of the paper.
 [[http://adsabs.harvard.edu/abs/2015ApJS..220...15P][Paxton et al. (2015)]]
 
 Modules for Experiments in Stellar Astrophysics (MESA): Binaries, Pulsations, and Explosions
+
+Materials have been updated to reflect the [[http://adsabs.harvard.edu/abs/2016ApJS..223...18P][published erratum]].
 ** 2015MNRAS.453.1910S
 [[http://adsabs.harvard.edu/abs/2015MNRAS.453.1910S][Schwab et al. (2015)]]
 
 Thermal Runaway During the Evolution of ONeMg Cores towards Accretion-Induced Collapse
+
+Materials have been updated to reflect the [[http://adsabs.harvard.edu/abs/2016MNRAS.458.3613S][published erratum]].
 ** 2016arXiv160602300S
 [[http://adsabs.harvard.edu/abs/2016arXiv160602300S][Schwab et al. (2016)]]
 

@@ -1,0 +1,58 @@
+From 3be1626a7c52c8a5c7179d66215bf35f5b76d74f Mon Sep 17 00:00:00 2001
+From: Josiah Schwab <jschwab@gmail.com>
+Date: Tue, 5 Jan 2016 14:07:03 -0800
+Subject: [PATCH 3/4] Apply previous corrections to rates test
+
+---
+ rates/test/test_output              |  4 ++--
+ rates/test/test_special.transitions | 12 +++++-------
+ 2 files changed, 7 insertions(+), 9 deletions(-)
+
+diff --git a/rates/test/test_output b/rates/test/test_output
+index f582138..f2e9ef5 100644
+--- a/rates/test/test_output
++++ b/rates/test/test_output
+@@ -338,8 +338,8 @@
+       na24  mg24      2.3600313369528947E-58
+ 
+  special weak rates
+-      mg24  na24      2.1458836733674090E-03
+-      na24  mg24      9.3639642238414640E-40
++      mg24  na24      3.8508631146179895E-03
++      na24  mg24      5.3949675684770085E-40
+ 
+  done
+ 
+diff --git a/rates/test/test_special.transitions b/rates/test/test_special.transitions
+index 3ba30f9..5635dd5 100644
+--- a/rates/test/test_special.transitions
++++ b/rates/test/test_special.transitions
+@@ -3,20 +3,18 @@
+ ! ...
+ ! <si_n> <sf_n> <logft_n>
+ 
+-! A = 24: mg -> na -> ne
+-
++! A = 24: mg -> na
+ ! (0.000 0+) -> (0.472 1+)
+ ! (0.000 0+) -> (1.347 1+)
+ 
+ mg24 na24 2
+-1 2 4.815
++1 2 4.8
+ 1 6 3.772
+ 
+-! A = 24: ne -> na -> mg
++! A = 24: na -> mg
+ ! (0.472 1+) -> (0.000 0+)
+ ! (1.347 1+) -> (0.000 0+)
+ 
+ na24 mg24 2
+-2 1 4.815
+-6 1 3.772
+-
++2 1 5.3
++6 1 4.249
+-- 
+2.9.2
+

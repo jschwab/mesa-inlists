@@ -1,0 +1,38 @@
+From b6a050b41733e5b24c2cd845f67d30396ce41812 Mon Sep 17 00:00:00 2001
+From: Josiah Schwab <jschwab@gmail.com>
+Date: Mon, 4 Jan 2016 11:07:53 -0800
+Subject: [PATCH 1/4] Fix sign in Coulomb barrier factor
+
+Following Fuller et al. (1980), we need to know the value of G(+Z,w),
+defined in equation (5a), in the relativistic limit.  I used
+equation (5f); I should have used equation (5e).
+
+This error initially appears in Schwab, Quataert, and Bildsten (2015)
+equation (A13) and then is wrong in all subsequent equations, including
+in Paxton et al. (2015).
+---
+ rates/private/eval_ecapture.f90 | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/rates/private/eval_ecapture.f90 b/rates/private/eval_ecapture.f90
+index beb534b..01fe65f 100644
+--- a/rates/private/eval_ecapture.f90
++++ b/rates/private/eval_ecapture.f90
+@@ -176,12 +176,12 @@ contains
+        case(rxn_ecapture)
+           ! use the *atomic* isotope data to get the *nuclear* mass excess
+           Qx = chem_isos% mass_excess(lhs) - chem_isos% mass_excess(rhs) - mec2
+-          G_GM = exp_cr(-const_pi* fine * Z_lhs)
++          G_GM = exp_cr(const_pi* fine * Z_lhs)
+           if (dbg) write(*,*) "ecapture ", key
+        case(rxn_betadecay)
+           ! use the *atomic* isotope data to get the *nuclear* mass excess
+           Qx = chem_isos% mass_excess(lhs) - chem_isos% mass_excess(rhs) + mec2
+-          G_GM = exp_cr(-const_pi * fine * Z_rhs)
++          G_GM = exp_cr(const_pi * fine * Z_rhs)
+           if (dbg) write(*,*) "betadecay ", key
+        end select
+ 
+-- 
+2.9.2
+

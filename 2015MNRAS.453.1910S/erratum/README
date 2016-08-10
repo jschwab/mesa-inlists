@@ -1,0 +1,5 @@
+These are the patches that were applied to MESA as part of resolving
+the erratum.  They probably don't apply cleanly on top of the other patches.
+
+If you're looking to reproduce these results, you should probably just
+start with r8118 or later and look at the test case wd_aic.
