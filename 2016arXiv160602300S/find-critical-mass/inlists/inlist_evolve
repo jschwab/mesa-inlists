@@ -1,0 +1,53 @@
+&star_job
+
+  load_saved_model = .true.
+
+  write_profile_when_terminate = .false.
+
+  set_initial_model_number = .true.
+  initial_model_number = 0
+
+  set_initial_age = .true.
+  initial_age = 0
+
+!  pgstar_flag = .true.
+  
+/ ! end of star_job namelist
+
+&controls
+
+  use_Type2_opacities = .true.
+  Zbase = 0.02
+
+  ! opacity_max = 0.2
+
+  ! bail out if things are taking too long
+  max_model_number = 10000
+
+  ! make a lot of output
+  history_interval = 1
+  profile_interval = 0
+  x_ctrl(1) = 10
+  max_num_profile_models = 100
+
+  terminal_interval = 10
+  write_header_frequency = 100
+
+  ! go slow; we're not in a hurry
+  delta_lgRho_cntr_limit = 0.01
+  delta_lgRho_cntr_hard_limit = 0.03
+!  log_center_density_limit = 
+
+! reduce opacities to get center to evolve
+  ! don't care about outside anyways
+  opacity_factor = 0.3
+  min_logT_for_opacity_factor_off = 3.0
+  min_logT_for_opacity_factor_on = 3.5
+  max_logT_for_opacity_factor_on = 6.5
+  max_logT_for_opacity_factor_off = 7.0
+
+/ ! end of controls namelist
+
+&pgstar
+
+/ ! end of pgstar namelist

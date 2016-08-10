@@ -1,0 +1,37 @@
+&star_job
+
+    create_pre_main_sequence_model = .true.
+    
+    save_model_when_terminate = .true.
+
+    change_net = .true.
+    new_net_name = 'approx21.net'
+    
+    num_steps_to_relax_composition = 250
+    relax_initial_to_xaccrete = .true.
+
+    pgstar_flag = .false.
+
+/ ! end of star_job namelist
+
+&controls
+
+  ! use opacities suitable for large metal fractions
+    use_Type2_opacities = .true.
+    Zbase = 0.02
+
+  ! convert to pure something
+    accrete_given_mass_fractions = .true.
+
+  ! when to stop
+    log_center_density_limit = 4
+
+  ! turn off nuclear reactions
+    eps_nuc_factor = 0
+    dxdt_nuc_factor = 0
+
+  ! no output
+    do_history_file = .false.
+    write_profiles_flag = .false.
+
+/ ! end of controls namelist

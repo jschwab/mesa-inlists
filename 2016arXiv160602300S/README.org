@@ -1,0 +1,10 @@
+* find-critical-mass
+This is the inlists and machinery used to find the critical ignition
+mass as discussed in Appendix C.  (It's basically my MESA work
+directory, but without the boilerplate files.)
+
+Run ~make_inlists.rb~, which generates the inlists using Bill Wolf's
+[[https://github.com/wmwolf/MesaScript][MesaScript]].  Then ~make_models.sh~ generates initial models of varying
+masses and ~evolve_models.sh~ evolves them to ignition (or
+non-ignition).  There is some logic to determine what happens in
+~src/run_star_extras.f~.
