@@ -1,1 +1,7 @@
-Revision 7624
+These runs used MESA version 7624.
+
+These cases have been added into the MESA test_suite, so there's no
+reason to use these directories.  Instead, go to star/test_suite in
+whatever MESA version you're using and use those.
+
+
