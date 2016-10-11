@@ -14,7 +14,7 @@ Materials have been updated to reflect the [[http://adsabs.harvard.edu/abs/2016A
 Thermal Runaway During the Evolution of ONeMg Cores towards Accretion-Induced Collapse
 
 Materials have been updated to reflect the [[http://adsabs.harvard.edu/abs/2016MNRAS.458.3613S][published erratum]].
-** 2016arXiv160602300S
-[[http://adsabs.harvard.edu/abs/2016arXiv160602300S][Schwab et al. (2016)]]
+** 2016MNRAS.463.3461S
+[[http://adsabs.harvard.edu/abs/2016MNRAS.463.3461S][Schwab et al. (2016)]]
 
 The Evolution and Fate of Super-Chandrasekhar Mass White Dwarf Merger Remnants
