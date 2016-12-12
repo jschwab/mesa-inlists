@@ -1,0 +1,6 @@
+* Section 4.4
+These are the models/inlists for the MESA calculations discussed in
+Section 4.4.  The script =make_inlists.rb= uses Bill Wolf's [[http://wmwolf.github.io/MesaScript/][MESAScript]]
+to generate inlists that survey the parameters of interest.  Models
+for each of these inlists can all be run with the =quenching.sh=
+script.  These calculations used MESA r8118.

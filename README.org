@@ -18,3 +18,7 @@ Materials have been updated to reflect the [[http://adsabs.harvard.edu/abs/2016M
 [[http://adsabs.harvard.edu/abs/2016MNRAS.463.3461S][Schwab et al. (2016)]]
 
 The Evolution and Fate of Super-Chandrasekhar Mass White Dwarf Merger Remnants
+** 2016ApJ...832...71L
+[[http://adsabs.harvard.edu/abs/2016ApJ...832...71L][Lecoanet et al. (2016)]]
+
+Turbulent Chemical Diffusion in Convectively Bounded Carbon Flames

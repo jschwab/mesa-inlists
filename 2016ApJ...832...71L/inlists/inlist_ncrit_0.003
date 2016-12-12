@@ -1,0 +1,24 @@
+
+&star_job
+  steps_to_take_before_terminate = 1000
+
+/ ! end of star_job namelist
+
+&controls
+  use_other_D_mix = .true.
+
+  x_ctrl(1) = 0.003
+  x_ctrl(2) = 1d+12
+
+  x_logical_ctrl(1) = .false.
+
+
+/ ! end of controls namelist
+
+&pgstar
+  Profile_Panels1_title = 'Ncrit: Nc=0.003 Np'
+
+  History_Panels1_title = 'Ncrit: Nc=0.003 Np'
+
+
+/ ! end of pgstar namelist

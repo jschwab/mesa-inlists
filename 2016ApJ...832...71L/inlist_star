@@ -1,0 +1,18 @@
+&star_job
+
+  kappa_file_prefix = 'gs98'
+  change_lnPgas_flag = .true.
+  new_lnPgas_flag = .true.
+  change_net = .true.
+  new_net_name = 'sagb_NeNa_MgAl.net'
+  pgstar_flag = .false.
+  pre_ms_relax_num_steps = 200
+
+  ! set initial model information
+  load_saved_model = .true.
+  saved_model_name = '9p5msun_cflame_at_0.2.mod'
+
+  set_initial_age = .true.
+  set_initial_model_number = .true.
+
+/ ! end of star_job namelist

@@ -1,0 +1,91 @@
+&controls
+
+  initial_z = 0.020
+
+  ! output
+  photostep = 1000
+  profile_interval =  100000
+  history_interval = 1
+  terminal_cnt = 100000
+  write_header_frequency = 100000
+  max_model_number = 15000
+
+  ! opacities
+
+  use_Type2_opacities = .true.
+  Zbase = 0.02
+
+  ! winds
+
+  cool_wind_RGB_scheme = 'Reimers'
+  cool_wind_AGB_scheme = 'Blocker'
+  RGB_to_AGB_wind_switch = 1d-4
+  Reimers_scaling_factor = 0.5d0
+  Blocker_scaling_factor = 0.05d0
+
+  ! resolution
+
+  mesh_delta_coeff = 0.5
+  max_allowed_nz = 400000
+
+  ! resolution
+
+  mesh_dlog_burn_c_dlogP_extra = 0.10
+  mesh_dlog_cc_dlogP_extra = 0.10
+  mesh_dlog_co_dlogP_extra = 0.10
+  mesh_dlog_oo_dlogP_extra = 0.10
+
+  mesh_logX_species(1) = 'c12'
+  mesh_logX_min_for_extra(1) = -2
+  mesh_dlogX_dlogP_extra(1) = 0.5
+  mesh_dlogX_dlogP_full_on(1) = 0
+  mesh_dlogX_dlogP_full_off(1) = -1
+
+  mesh_logX_species(2) = 'h1'
+  mesh_logX_min_for_extra(2) = -2
+  mesh_dlogX_dlogP_extra(2) = 0.5
+  mesh_dlogX_dlogP_full_on(2) = 0
+  mesh_dlogX_dlogP_full_off(2) = -1
+
+  mesh_logX_species(3) = 'he4'
+  mesh_logX_min_for_extra(3) = -2
+  mesh_dlogX_dlogP_extra(3) = 0.5
+  mesh_dlogX_dlogP_full_on(3) = 0
+  mesh_dlogX_dlogP_full_off(3) = -1
+
+  mesh_dlog_pp_dlogP_extra = 0.25
+  xa_mesh_delta_coeff(1) = 0.5
+  xa_mesh_delta_coeff(2) = 0.5
+  xa_mesh_delta_coeff(3) = 0.5
+
+  varcontrol_target = 1d-4
+
+  use_ledoux_criterion =.true.
+
+  ! semiconvection
+  alpha_semiconvection = 1d-2
+  semiconvection_option = 'Langer_85 mixing; gradT = gradr'
+
+  ! thermohaline
+
+  thermohaline_coeff = 0.0
+  thermohaline_option = 'Kippenhahn'
+
+  ! angular momentum transport
+
+  am_D_mix_factor = 0.0333333333333
+  D_DSI_factor = 1
+  D_SH_factor  = 1
+  D_SSI_factor = 1
+  D_ES_factor  = 1
+  D_GSF_factor = 1
+  D_ST_factor  = 1
+
+  ! stop when the flame reaches the center
+  xa_central_lower_limit_species(1) = 'c12'
+  xa_central_lower_limit(1) = 0.1
+
+  do_history_file = .true.
+  write_profiles_flag = .false.
+
+/ ! end of controls namelist

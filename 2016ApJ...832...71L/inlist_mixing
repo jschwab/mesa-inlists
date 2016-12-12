@@ -1,0 +1,26 @@
+&controls
+
+  ! overshoot_f_above_nonburn = 0.000   ! for nonburning regions
+  ! overshoot_f_below_nonburn = 0.000
+  ! overshoot_f_above_burn_h = 0.000    ! for hydrogen burning regions
+  ! overshoot_f_below_burn_h = 0.000
+  ! overshoot_f_above_burn_he = 0.000   ! for helium burning regions
+  ! overshoot_f_below_burn_he = 0.000
+  ! overshoot_f_above_burn_z = 0.000    ! for heavier than helium burning region
+  ! overshoot_f_below_burn_z = 0.000
+
+  ! overshoot_f0_below_burn_z_shell  = 1d-3
+  ! step_overshoot_f_below_burn_z_shell = 0.10
+  ! step_overshoot_D = 9d3
+  ! step_overshoot_D0_coeff = 0
+
+  ! overshoot_f0_below_burn_z_shell  = 1d-3
+  ! overshoot_f_below_burn_z_shell  = 1d-3
+
+  ! D_mix_ov_limit = 1d-3
+
+  max_years_for_timestep = 2.5
+
+  use_other_mesh_functions = .true.
+
+/

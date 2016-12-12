@@ -1,0 +1,129 @@
+&pgstar
+
+  Profile_Panels1_win_flag = .false.
+
+  Profile_Panels1_win_width = 8
+  Profile_Panels1_win_aspect_ratio = 1.0 ! aspect_ratio = height/width
+
+  Profile_Panels1_xleft = 0.15
+  Profile_Panels1_xright = 0.85
+  Profile_Panels1_ybot = 0.15
+  Profile_Panels1_ytop = 0.85
+  Profile_Panels1_txt_scale = 1.0
+  Profile_Panels1_title = 'Carbon flame (w/ mixing)'
+
+  Profile_Panels1_xaxis_name = 'z_div_H'
+  Profile_Panels1_xaxis_reversed = .false.
+  Profile_Panels1_xmin = -0.35
+  Profile_Panels1_xmax = 0.35
+  Profile_Panels1_xmargin = 0d0
+
+  ! setup default plot
+  Profile_Panels1_num_panels = 4
+
+  ! Profile_Panels1_yaxis_name(:) = ''
+  ! Profile_Panels1_yaxis_reversed(:) = .false.
+  ! Profile_Panels1_ymin(:) = -101d0! only used if /= -101d0
+  ! Profile_Panels1_ymax(:) = -101d0 ! only used if /= -101d0
+  ! Profile_Panels1_ymargin(:) = 0.1
+  ! Profile_Panels1_dymin(:) = -1
+
+  ! Profile_Panels1_other_yaxis_name(:) = ''
+  ! Profile_Panels1_other_yaxis_reversed(:) = .false.
+  ! Profile_Panels1_other_ymin(:) = -101d0 ! only used if /= -101d0
+  ! Profile_Panels1_other_ymax(:) = -101d0 ! only used if /= -101d0
+  ! Profile_Panels1_other_ymargin(:) = 0.1
+  ! Profile_Panels1_other_dymin(:) = -1
+
+
+  Profile_Panels1_yaxis_name(1) = 'logRho'
+  Profile_Panels1_other_yaxis_name(1) = 'logT'
+
+  Profile_Panels1_yaxis_name(2) = 'c12'
+  Profile_Panels1_ymin(2) = 0
+  Profile_Panels1_ymax(2) = 0.5
+
+  Profile_Panels1_other_yaxis_name(2) = 'log_D_mix'
+  Profile_Panels1_other_ymin(2) = -5
+  Profile_Panels1_other_ymax(2) = 15
+
+
+  Profile_Panels1_yaxis_name(3) = 'log_abs_eps_nuc'
+  Profile_Panels1_ymin(3) = 0
+  Profile_Panels1_ymax(3) = 10
+
+  Profile_Panels1_other_yaxis_name(3) = 'log_N_div_Npeak'
+  Profile_Panels1_other_ymin(3) = -3.5
+  Profile_Panels1_other_ymax(3) = 0.5
+
+  ! Profile_Panels1_yaxis_name(4) = 'mixing_type'
+  ! Profile_Panels1_ymin(4) = 0
+  ! Profile_Panels1_ymax(4) = 6
+
+  ! Profile_Panels1_other_yaxis_name(4) = 'stability_type'
+  ! Profile_Panels1_other_ymin(4) = 0
+  ! Profile_Panels1_other_ymax(4) = 6
+
+  Profile_Panels1_yaxis_name(4) = 'log_Le'
+  Profile_Panels1_ymin(4) = -3
+  Profile_Panels1_ymax(4) = 7
+
+  ! Profile_Panels1_yaxis_name(4) = 'mixing_type'
+  ! Profile_Panels1_ymin(4) = 0
+  ! Profile_Panels1_ymax(4) = 10
+
+
+  Profile_Panels1_other_yaxis_name(4) = 'Le'
+  Profile_Panels1_other_ymin(4) = 0
+  Profile_Panels1_other_ymax(4) = 10
+
+
+  !Profile_Panels1_other_yaxis_name(2) = 'c12'
+
+  Profile_Panels1_show_grid = .false.
+
+  ! file output
+  Profile_Panels1_file_flag = .true.
+  Profile_Panels1_file_cnt = 1 ! output when mod(model_number,Profile_Panels1_file_cnt)==0
+
+  pause = .false.
+
+  History_Panels1_win_flag = .false.
+
+  History_Panels1_win_width = 6
+  History_Panels1_win_aspect_ratio = 0.75 ! aspect_ratio = height/width
+
+  History_Panels1_xleft = 0.15
+  History_Panels1_xright = 0.85
+  History_Panels1_ybot = 0.15
+  History_Panels1_ytop = 0.85
+  History_Panels1_txt_scale = 1.0
+  History_Panels1_title = 'History_Panels1'
+
+  History_Panels1_xaxis_name = 'model_number'
+  History_Panels1_xmin = 0
+  History_Panels1_xmax = 1000
+  History_Panels1_max_width = 1000 ! only used if > 0.  causes xmin to move with xmax.
+  History_Panels1_dxmin = -1
+  History_Panels1_xaxis_reversed = .false.
+  History_Panels1_xaxis_log = .false. ! show log10 of abs value
+
+  ! setup default
+  History_Panels1_num_panels = 1
+
+  History_Panels1_yaxis_name(1) = 'log_Lnuc'
+  History_Panels1_yaxis_reversed(1) = .false.
+  History_Panels1_ymin(1) = 4 ! only used if /= -101d0
+  History_Panels1_ymax(1) = 6 ! only used if /= -101d0
+  History_Panels1_dymin(1) = -1
+
+  History_Panels1_other_yaxis_name(1) = 'log_LZ'
+  History_Panels1_other_yaxis_reversed(1) = .false.
+  History_Panels1_other_ymin(1) = 3 ! only used if /= -101d0
+  History_Panels1_other_ymax(1) = 5 ! only used if /= -101d0
+
+  ! file output
+  History_Panels1_file_flag = .true.
+  History_Panels1_file_cnt = 1 ! output when mod(model_number,History_Panels1_file_cnt)==0
+
+/ ! end of pgstar namelist

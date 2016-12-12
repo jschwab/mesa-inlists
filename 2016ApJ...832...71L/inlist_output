@@ -1,0 +1,14 @@
+&star_job
+
+  ! save_model_when_terminate = .true.
+  ! !save_model_filename = '../9p5msun_at_c_exhaustion.mod'
+  ! save_model_filename = '../9p5msun_cflame_at_0.2.mod'
+
+  ! write_profile_when_terminate = .false.
+  ! filename_for_profile_when_terminate = 'lecoanet.profile'
+
+  !steps_to_take_before_terminate = 1
+
+  pgstar_flag = .true.
+  
+/
