@@ -1,0 +1,25 @@
+
+&star_job
+  save_model_when_terminate = .true.
+  save_model_filename = 'models/composition_logxna-2.00.mod'
+
+/ ! end of star_job namelist
+
+&controls
+  mass_change = 0
+
+  accrete_given_mass_fractions = .true.
+  num_accretion_species = 3
+  accretion_species_id(1) = 'o16'
+  accretion_species_id(2) = 'ne20'
+  accretion_species_id(3) = 'na23'
+  accretion_species_xa(1) = 0.5
+  accretion_species_xa(2) = 0.49
+  accretion_species_xa(3) = 0.01
+
+
+/ ! end of controls namelist
+
+&pgstar
+
+/ ! end of pgstar namelist

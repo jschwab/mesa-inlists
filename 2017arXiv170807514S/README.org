@@ -1,0 +1,24 @@
+* mesa-urca
+These are the inlists and machinery used for the calculations of the
+ONe WD models shown throughout this paper.  They used MESA version
+r9793.
+
+The script =make_models.sh= generates the initial models.  Then for
+each of the parameter studies there is a [[https://github.com/wmwolf/MesaScript][MesaScript]] file
+(e.g. =named.rb=) that generates the inlists and then a bash script
+(e.g. =named.sh=) that runs them all.
+
+The fiducial model is named =SQB15+= and the fiducial transitions are
+=transitions/weak-logft-11.transitions=.
+
+The same inlists can be used to reproduce the material shown in
+Appendix D that compares the fiducial results with runs using rates
+from Suzuki et al. (2016).  This comparison was done with a private
+development version, but MESA r10000 or later contains the Suzuki
+rates (see the star_job control use_suzuki_weak_rates).
+* Appendix C
+This contains the jupyter notebook used to run the Dedalus
+calculations explaining the convective (in)stability of the
+electron-capture fronts.
+
+

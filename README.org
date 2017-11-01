@@ -22,3 +22,7 @@ The Evolution and Fate of Super-Chandrasekhar Mass White Dwarf Merger Remnants
 [[http://adsabs.harvard.edu/abs/2016ApJ...832...71L][Lecoanet et al. (2016)]]
 
 Turbulent Chemical Diffusion in Convectively Bounded Carbon Flames
+** 2017arXiv170807514S
+[[http://adsabs.harvard.edu/abs/2017arXiv170807514S][Schwab et al. (2017)]]
+
+The Importance of Urca-process Cooling in Accreting ONe White Dwarfs

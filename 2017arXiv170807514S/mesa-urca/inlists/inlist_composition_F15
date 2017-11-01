@@ -1,0 +1,32 @@
+&star_job
+  save_model_when_terminate = .true.
+  save_model_filename = 'models/composition_F15.mod'
+/ ! end of star_job namelist
+
+&controls
+
+  mass_change = 0
+
+  accrete_given_mass_fractions = .true.
+
+  num_accretion_species = 6
+
+  accretion_species_id(1) = 'o16'
+  accretion_species_xa(1) = 0.490
+
+  accretion_species_id(2) = 'ne20'
+  accretion_species_xa(2) = 0.400
+
+  accretion_species_id(3) = 'ne22'
+  accretion_species_xa(3) = 0.018
+
+  accretion_species_id(4) = 'na23'
+  accretion_species_xa(4) = 0.060
+
+  accretion_species_id(5) = 'mg24'
+  accretion_species_xa(5) = 0.030
+
+  accretion_species_id(6) = 'mg25'
+  accretion_species_xa(6) = 0.002
+
+/ ! end of controls namelist

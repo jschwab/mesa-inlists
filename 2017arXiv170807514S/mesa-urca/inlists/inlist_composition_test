@@ -1,0 +1,23 @@
+&star_job
+  save_model_when_terminate = .true.
+  save_model_filename = 'models/composition_test.mod'
+/ ! end of star_job namelist
+
+&controls
+
+  mass_change = 0
+
+  accrete_given_mass_fractions = .true.
+
+  num_accretion_species = 3
+
+  accretion_species_id(1) = 'o16'
+  accretion_species_xa(1) = 0.500
+
+  accretion_species_id(2) = 'ne20'
+  accretion_species_xa(2) = 0.450
+
+  accretion_species_id(3) = 'na24'
+  accretion_species_xa(3) = 0.050
+
+/ ! end of controls namelist

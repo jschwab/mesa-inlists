@@ -1,0 +1,24 @@
+&star_job
+
+    create_pre_main_sequence_model = .true.
+
+    pgstar_flag = .false.
+
+    save_model_when_terminate = .true.
+    save_model_filename = "models/pms.mod"
+
+/ ! end of star_job namelist
+
+&controls
+
+  ! starting specifications
+    initial_mass = 1.3 ! in Msun units
+   
+  ! when to stop
+    log_center_density_limit = 4
+
+  ! turn off nuclear reactions
+    eps_nuc_factor = 0
+    dxdt_nuc_factor = 0
+
+/ ! end of controls namelist
