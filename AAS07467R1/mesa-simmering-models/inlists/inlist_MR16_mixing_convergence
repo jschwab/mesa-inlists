@@ -1,0 +1,37 @@
+&star_job
+
+  change_initial_net = .true.
+  new_net_name = 'Simmering.net'
+
+  use_special_weak_rates = .true.                      ! Urca processes
+  special_weak_states_file = 'MR16.states'
+  special_weak_transitions_file = 'MR16.transitions'
+  ion_coulomb_corrections = 'PCR2009'
+  electron_coulomb_corrections = 'Itoh2002'
+
+/ ! end of star_job namelist
+
+
+&controls
+
+  mix_factor = 0
+
+  use_other_split_mix = .true.
+  split_mixing_choice = -2
+  split_mix_do_burn = .true.
+
+  varcontrol_target = 3d-4
+  mesh_delta_coeff = 0.3
+
+  delta_lgRho_cntr_limit = 1d-3
+  delta_lgRho_cntr_hard_limit = 3d-4
+
+  delta_lgT_cntr_limit = 3d-3
+  delta_lgT_cntr_hard_limit = 1d-3
+
+/ ! end of controls namelist
+
+
+&pgstar
+
+/ ! end of pgstar namelist

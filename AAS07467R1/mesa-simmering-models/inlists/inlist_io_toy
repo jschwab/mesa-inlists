@@ -1,0 +1,11 @@
+&star_job
+
+  load_saved_model = .true.
+  saved_model_name = 'models/final_toy.mod'
+
+/
+
+&controls
+
+/
+

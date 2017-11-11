@@ -1,0 +1,48 @@
+! I AM CHANGING mesa_45 BY ADDING ne23 IN ORDER TO STUDY CARBON SIMMERING. All the reactions linking Ne23 and the other isotopes will be automatically added in this soft net.
+
+
+add_isos_and_reactions(
+   neut
+    h  1  2 ! hydrogen
+   he  3  4 ! helium
+   li7      ! lithium
+   be7
+   be  9 10 ! berylium
+    b8      ! boron
+    c 12 13 ! carbon
+    n 13 15 ! nitrogen
+    o 14 18 ! oxygen
+    f 17 19 ! fluorine
+   ne 18 24 ! neon
+   na 21 25 ! sodium
+   mg 23 26 ! magnesium
+   al 25 27 ! aluminum
+   si 27 28 ! silicon
+    p 30 31 ! phosphorus
+    s 31 32 ! sulfur
+   )
+
+! $MESA_DIR/rates/private/rates_names.f $MESA_DIR/data/rates_data/reactions.list have most of the names. See all in $MESA_DIR/data/rates_data/cache      
+! $MESA_DIR/data/net_data/NET_NOTES explains how to manually add reactions. BEWARE OF hard nets vs soft nets (like this one)
+! $MESA_DIR/data/star/wd_models contains lots of models of WDs
+          
+! The directory $MESA_DIR/data/star_data/plot_info contains files with the coordinates of various critical curves in T-Rho space -- such as that 
+! for carbon ignition (carbon_burn.data) and oxygen ignition (oxygen_burn.data) -- which are drawn on pgstar output. For future reference, it appears 
+!that these ignition curves are where the specific energy generation rate exceeds 1 erg / g / s, using a composition that is 100% of whatever it is that is burning.
+
+! here the other isos for the Suzuki reactions
+
+add_isos_and_reactions(
+    o19
+    f21
+    mg27
+)
+
+remove_reactions(
+    r_f21_wk-minus_ne21
+    r_ne23_wk-minus_na23
+    r_na24_wk-minus_mg24
+    r_ne24_wk-minus_na24
+    r_na25_wk-minus_mg25
+    r_mg27_wk-minus_al27
+)

@@ -1,0 +1,39 @@
+&star_job
+  
+  load_saved_model = .true.
+  saved_model_name = 'models/pms.mod'
+
+  num_steps_to_relax_composition = 100
+
+  relax_initial_to_xaccrete = .true.
+
+  set_to_this_tau_factor = 300
+  set_tau_factor = .true.
+
+  change_net = .true.
+  new_net_name = 'Simmering.net'
+
+  read_extra_star_job_inlist1 = .true.
+  extra_star_job_inlist1_name = 'inlist_composition_id'
+  
+/ ! end of star_job namelist
+
+&controls
+
+  log_center_density_limit = 7
+
+  use_Type2_opacities = .true.
+  Zbase = 0.02
+
+  ! turn off nuclear reactions
+  eps_nuc_factor = 0
+  dxdt_nuc_factor = 0
+
+  read_extra_controls_inlist1 = .true.
+  extra_controls_inlist1_name = 'inlist_composition_id'
+
+/ ! end of controls namelist
+
+&pgstar
+
+/ ! end of pgstar namelist

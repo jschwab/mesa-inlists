@@ -1,0 +1,27 @@
+
+&star_job
+  save_model_when_terminate = .true.
+  save_model_filename = 'models/composition_fiducial.mod'
+
+/ ! end of star_job namelist
+
+&controls
+  mass_change = 0
+
+  accrete_given_mass_fractions = .true.
+  num_accretion_species = 4
+  accretion_species_id(1) = 'c12'
+  accretion_species_id(2) = 'o16'
+  accretion_species_id(3) = 'ne22'
+  accretion_species_id(4) = 'na23'
+  accretion_species_xa(1) = 0.4
+  accretion_species_xa(2) = 0.58485
+  accretion_species_xa(3) = 0.015
+  accretion_species_xa(4) = 0.00015
+
+
+/ ! end of controls namelist
+
+&pgstar
+
+/ ! end of pgstar namelist

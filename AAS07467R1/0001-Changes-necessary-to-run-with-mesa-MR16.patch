@@ -1,0 +1,94 @@
+From 936d8210009b078d8309e6b13702a639e7fe3ddf Mon Sep 17 00:00:00 2001
+From: Josiah Schwab <jschwab@gmail.com>
+Date: Tue, 13 Jun 2017 17:40:38 -0700
+Subject: [PATCH] Changes necessary to run with mesa-MR16
+
+---
+ inlist_pgstar         |  8 ++++----
+ inlists/inlist_simmer |  2 +-
+ src/run_star_extras.f | 16 ----------------
+ 3 files changed, 5 insertions(+), 21 deletions(-)
+
+diff --git a/inlist_pgstar b/inlist_pgstar
+index 28ca721..80264ae 100644
+--- a/inlist_pgstar
++++ b/inlist_pgstar
+@@ -111,7 +111,7 @@
+   Grid1_file_flag = .true.
+   Grid1_file_dir = 'png'
+   Grid1_file_prefix = 'grid1'
+-  Grid1_file_interval = 5 ! output when mod(model_number,Grid1_file_interval)==0
++  Grid1_file_cnt = 5 ! output when mod(model_number,Grid1_file_cnt)==0
+   Grid1_file_width = 16 ! negative means use same value as for window
+   Grid1_file_aspect_ratio = -1 ! negative means use same value as for window
+ 
+@@ -151,7 +151,7 @@
+   Abundance_file_flag = .false.
+   Abundance_file_dir = 'png'
+   Abundance_file_prefix = 'abund_'
+-  Abundance_file_interval = 5 ! output when mod(model_number,Abundance_file_interval)==0
++  Abundance_file_cnt = 5 ! output when mod(model_number,Abundance_file_cnt)==0
+   Abundance_file_width = -1 ! (inches) negative means use same value as for window
+   Abundance_file_aspect_ratio = -1 ! negative means use same value as for window
+   ! MESA uses PGPLOT for live plotting and gives the user a tremendous
+@@ -261,7 +261,7 @@
+   History_Panels1_file_flag = .false.
+   History_Panels1_file_dir = 'png'
+   History_Panels1_file_prefix = 'History_Panels1_'
+-  History_Panels1_file_interval = 5 ! output when mod(model_number,History_Panels1_file_interval)==0
++  History_Panels1_file_cnt = 5 ! output when mod(model_number,History_Panels1_file_cnt)==0
+   History_Panels1_file_width = -1 ! (inches) negative means use same value as for window
+   History_Panels1_file_aspect_ratio = -1 ! negative means use same value as for window
+ 
+@@ -353,7 +353,7 @@
+   Profile_Panels1_file_flag = .false.
+   Profile_Panels1_file_dir = 'png'
+   Profile_Panels1_file_prefix = 'profile_panels1_'
+-  Profile_Panels1_file_interval = 5 ! output when mod(model_number,Profile_Panels1_file_interval)==0
++  Profile_Panels1_file_cnt = 5 ! output when mod(model_number,Profile_Panels1_file_cnt)==0
+   Profile_Panels1_file_width = -1 ! (inches) negative means use same value as for window
+   Profile_Panels1_file_aspect_ratio = -1 ! negative means use same value as for window
+ 
+diff --git a/inlists/inlist_simmer b/inlists/inlist_simmer
+index 5b61011..81a366d 100644
+--- a/inlists/inlist_simmer
++++ b/inlists/inlist_simmer
+@@ -52,7 +52,7 @@
+   logQ_limit = 1d6
+   gamma_center_limit = 1d6
+ 
+-  photo_interval = 100
++  photostep = 100
+   profile_interval = 100000
+   history_interval = 1
+   terminal_interval = 10
+diff --git a/src/run_star_extras.f b/src/run_star_extras.f
+index d04291c..ade1be2 100644
+--- a/src/run_star_extras.f
++++ b/src/run_star_extras.f
+@@ -49,22 +49,6 @@
+          ! e.g., other_wind, other_mixing, other_energy  (see star_data.inc)
+          s% other_split_mix => SGC06_other_split_mix
+ 
+-         ! Uncomment these lines if you wish to use the functions in this file,
+-         ! otherwise we use a null_ version which does nothing.
+-         s% extras_startup => extras_startup
+-         s% extras_check_model => extras_check_model
+-         s% extras_finish_step => extras_finish_step
+-         s% extras_after_evolve => extras_after_evolve
+-         s% how_many_extra_history_columns => how_many_extra_history_columns
+-         s% data_for_extra_history_columns => data_for_extra_history_columns
+-         s% how_many_extra_profile_columns => how_many_extra_profile_columns
+-         s% data_for_extra_profile_columns => data_for_extra_profile_columns  
+-
+-         ! Once you have set the function pointers you want,
+-         ! then uncomment this (or set it in your star_job inlist)
+-         ! to disable the printed warning message,
+-         s% job% warn_run_star_extras =.false.       
+-
+       end subroutine extras_controls
+ 
+       subroutine SGC06_other_split_mix( &
+-- 
+2.15.0
+

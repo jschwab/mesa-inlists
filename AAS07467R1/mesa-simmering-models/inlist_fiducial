@@ -1,0 +1,31 @@
+&star_job
+
+  pgstar_flag = .false.
+
+/ ! end of star_job namelist
+
+&controls
+
+  mass_change = 1e-6
+
+  varcontrol_target = 1e-3
+  mesh_delta_coeff = 1.0
+
+  max_center_cell_dq = 1d-8
+
+  ! retry with a smaller timestep if the change of eta in any cell is
+  ! greater than x_ctrl(1)
+  x_logical_ctrl(1) = .true.
+  x_ctrl(1) = 3.0
+
+  ! limit cell-to-cell variations in eta to be less than x_ctrl(2)
+  use_other_mesh_functions = .true.
+  x_ctrl(2) = 3.0
+
+  terminal_interval = 10
+
+/ ! end of controls namelist
+
+&pgstar
+
+/ ! end of pgstar namelist

@@ -1,0 +1,39 @@
+* mesa-simmering-models
+The inlists included here should be used with MESA r10108 (or later).
+
+The MESA models shown in the paper were originally run with a variety
+of MESA versions, as the tabulated weak rates capabilities used in the
+"P17 rates" models were being developed while this manuscript was in
+preparation.
+
+To exactly reproduce the "MR16 rates" models, one needs to use the
+MESA version used in Martínez-Rodríguez et al. (2016), "Neutronization
+during carbon simmering in Type Ia supernova progenitors".  These
+files are available on mesastar.org.  A patch file demonstrating the
+minor inlists/run_star_extras tweaks needed to run with this older
+MESA version is included.  However, there's really no reason to do
+this.  Use the tabulated rates.  They're better and faster!
+
+The P17.sh and MR16.sh files script runs most of the models shown in
+the paper.  Then Plots.ipynb will show you the plots.
+
+To reproduce the results shown in Fig. 6, you have to do some runs
+manually.  For the line without beta decays, see inlist_P17_nobeta.
+First, run until a convective core forms.  Then, restart with the
+different network.  For the line where the energy was turned off, you
+need to change the MESA internals.  Go to rates/private/eval_weak.f90
+and around line 295 add something like
+
+#+BEGIN_SRC f90
+  if (chem_isos% Z_plus_N(in) .ge. 19) then                                                     
+     Q(i) = 0                                                                                   
+     dQ_dlnT(i) = 0                                                                             
+     dQ_dlnRho(i) = 0                                                                           
+     Qneu(i) = 0                                                                                
+     dQneu_dlnT(i) = 0                                                                          
+     dQneu_dlnRho(i) = 0                                                                        
+  endif                     
+#+END_SRC
+
+Then ./mk and ./export this rates module, recompile your working
+directory, and do the restart with this modified MESA version.

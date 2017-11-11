@@ -1,0 +1,31 @@
+&star_job
+
+  ! at start
+  ! change_initial_net = .true.
+  ! new_net_name = 'Simmering_plus.net'
+
+  ! then, at restart
+  change_net = .true.
+  new_net_name = 'Simmering_plus_minusbeta.net'
+
+  load_saved_model = .true.
+  saved_model_name = 'models/final_P17.mod'
+
+  use_suzuki_weak_rates = .true.
+  rate_tables_dir = 'tables_gmp'
+
+/ ! end of star_job namelist
+
+
+&controls
+
+  ! at start (stop when conv core)
+  ! x_logical_ctrl(1) = .true.
+
+/ ! end of controls namelist
+
+
+&pgstar
+
+
+/ ! end of pgstar namelist

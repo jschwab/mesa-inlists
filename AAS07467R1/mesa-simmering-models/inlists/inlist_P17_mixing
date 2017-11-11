@@ -1,0 +1,28 @@
+&star_job
+
+  change_initial_net = .true.
+  new_net_name = 'Simmering_plus.net'
+
+  load_saved_model = .true.
+  saved_model_name = 'models/final_P17.mod'
+
+  use_suzuki_weak_rates = .true.
+  rate_tables_dir = 'tables_gmp'
+
+/ ! end of star_job namelist
+
+
+&controls
+
+  mix_factor = 0
+
+  use_other_split_mix = .true.
+  split_mixing_choice = -2
+  op_split_burn = .true.
+
+/ ! end of controls namelist
+
+
+&pgstar
+
+/ ! end of pgstar namelist
