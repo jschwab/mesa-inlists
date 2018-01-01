@@ -26,7 +26,7 @@ Turbulent Chemical Diffusion in Convectively Bounded Carbon Flames
 [[http://adsabs.harvard.edu/abs/2017MNRAS.472.3390S][Schwab et al. (2017)]]
 
 The Importance of Urca-process Cooling in Accreting ONe White Dwarfs
-** AAS07467R1
-Schwab et al. (2017)
+** 2017ApJ...851..105S
+[[http://adsabs.harvard.edu/abs/2017ApJ...851..105S][Schwab et al. (2017)]]
 
 Exploring the Carbon Simmering Phase: Reaction Rates, Mixing, and the Convective Urca Process
