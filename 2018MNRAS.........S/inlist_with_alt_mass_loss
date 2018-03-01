@@ -1,0 +1,12 @@
+&star_job
+
+/
+
+&controls
+
+  ! use other_wind
+  use_other_wind = .true.
+  x_ctrl(2) = 1d-10
+
+/
+

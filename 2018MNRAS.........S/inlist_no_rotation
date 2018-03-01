@@ -1,0 +1,11 @@
+&star_job
+
+  change_initial_rotation_flag = .true.
+  new_rotation_flag = .false.
+
+/ !end of star_job namelist
+
+
+&controls
+
+/ ! end of controls namelist

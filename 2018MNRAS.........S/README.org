@@ -1,0 +1,23 @@
+* Hot subdwarfs formed from the merger of two He white dwarfs
+The inlists included here were run with MESA r10108.
+
+Here, the models are identified with the names ZP6 and ZP7, which were
+the IDs of the initial models from Schwab et al. (2012).  The IDs used
+in the paper were M05 (0.2+0.3) and M07 (0.3+0.4), respectively.
+
+The following shell scripts run the models from the paper.  They make
+use of Bill Wolf's [[https://github.com/wmwolf/MesaScript][MesaScript]].
+
+** =create_models.sh=
+This relaxes the initial models given by the profiles in
+=zeus_models=.  For convenience, this script has already been run and
+the resulting MESA models are included in =models=.
+** =run_models.sh=
+This script runs the models up to core He-ignition.  There are lots of
+different variations.  (See the individual inlists for details.)
+** =run_sdb_models.sh=
+This script evolves a subset of the models from the previous step
+through the core He-burning (CHeB) phase.
+** =run_beyond_models.sh=
+This script evolves a subset of the models from the previous step down
+the WD cooling track.

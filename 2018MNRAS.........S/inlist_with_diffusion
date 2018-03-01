@@ -1,0 +1,10 @@
+&star_job
+
+/
+
+&controls
+
+    do_element_diffusion = .true.
+    diffusion_use_full_net = .true.
+
+/

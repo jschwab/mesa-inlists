@@ -1,0 +1,58 @@
+! inlist to make post-viscous WD merger models
+
+&star_job
+
+  new_rotation_flag = .true.
+  change_initial_rotation_flag = .true.
+
+  relax_initial_angular_momentum = .true.
+  relax_angular_momentum_filename = 'zeus_j.dat'
+
+  relax_initial_composition = .true.
+  relax_composition_filename = 'zeus_X.dat'
+  num_steps_to_relax_composition = 300
+
+  relax_initial_entropy = .true.
+  get_entropy_for_relax_from_eos = 'eosDT'
+  relax_entropy_filename = 'zeus_DT.dat'
+  num_timescales_for_relax_entropy = 30
+  
+  ! save a model at the end of the run
+  save_model_when_terminate = .true.
+  save_model_filename = 'final.mod'
+
+  ! save a profile at the end of the run
+  write_profile_when_terminate = .true.
+  filename_for_profile_when_terminate = 'final.profile'
+
+! display on-screen plots
+  pgstar_flag = .false.
+
+/ !end of star_job namelist
+
+
+&controls
+
+  ! use type II opactities
+  use_Type2_opacities = .true.
+  Zbase = 0.02
+
+  max_model_number = 1
+
+  read_extra_controls_inlist1 = .true.
+  extra_controls_inlist1_name = 'initial_mass'
+
+
+/ ! end of controls namelist
+
+
+&pgstar
+
+    TRho_Profile_win_flag = .true.
+    Abundance_win_flag = .true.
+
+    Profile_Panels1_win_flag = .true.
+    Profile_Panels1_xaxis_name = 'zone'
+    Profile_Panels1_yaxis_name(1) = 'extra_heat'
+
+/ ! end of pgstar namelist

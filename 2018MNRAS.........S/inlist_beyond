@@ -1,0 +1,24 @@
+&star_job
+
+
+/ !end of star_job namelist
+
+
+&controls
+
+  ! stop when we've gone down the cooling track
+  log_L_lower_limit = -2
+
+  ! don't stop when we've reached the end of core helium burning
+  xa_central_lower_limit_species(1) = 'he4'
+  xa_central_lower_limit(1) = 0
+
+  !which_atm_option = 'grey_and_kap'
+
+  report_ierr = .false.
+
+/ ! end of controls namelist
+
+&pgstar
+
+/ ! end of pgstar namelist

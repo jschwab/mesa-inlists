@@ -1,0 +1,25 @@
+&star_job
+
+/
+
+&controls
+
+  ! use other_wind
+  use_other_wind = .true.
+  x_ctrl(2) = 1d-10
+
+  max_rotational_mdot_boost = 1d2
+
+  ! we'll turn it on after 1000 yer
+  x_logical_ctrl(1) = .true.
+  x_ctrl(1) = 1000
+  max_mdot_redo_cnt = 0
+  
+  min_years_dt_for_redo_mdot = 1
+  surf_w_div_w_crit_limit = 0.99d0
+  surf_w_div_w_crit_tol = 0.05d0
+  mdot_revise_factor = 2
+  implicit_mdot_boost = 0.1d0
+
+/
+

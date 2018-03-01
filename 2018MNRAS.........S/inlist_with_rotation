@@ -1,0 +1,20 @@
+&star_job
+
+  new_D_omega_flag = .true.
+  change_initial_D_omega_flag = .true.
+
+/ !end of star_job namelist
+
+
+&controls
+
+  am_nu_visc_factor = 0
+  am_D_mix_factor = 0.0333333333333333d00
+  D_DSI_factor = 0
+  D_SH_factor = 1
+  D_SSI_factor = 1
+  D_ES_factor = 1
+  D_GSF_factor = 1
+  D_ST_factor = 1
+
+/ ! end of controls namelist

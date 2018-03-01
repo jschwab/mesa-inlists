@@ -1,0 +1,31 @@
+&star_job
+
+/
+
+&controls
+
+    do_element_diffusion = .true.
+    diffusion_use_full_net = .false.
+
+    diffusion_num_classes = 3
+
+    diffusion_class_representative(1) = 'h1'
+    diffusion_class_representative(2) = 'he4'
+    diffusion_class_representative(3) = 'o16'
+
+    diffusion_class_A_max(1) = 2
+    diffusion_class_A_max(2) = 4
+    diffusion_class_A_max(3) = 10000
+
+    diffusion_class_typical_charge(1) = 1
+    diffusion_class_typical_charge(2) = 2
+    diffusion_class_typical_charge(3) = 8
+
+    diffusion_min_dq_at_surface = 1d-11
+    dH_div_H_limit_min_H = 1e99
+    dHe_div_He_limit_min_He = 1e99
+
+    he_core_boundary_h1_fraction = 0.1
+
+
+/

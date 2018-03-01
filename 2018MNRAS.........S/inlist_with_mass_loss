@@ -1,0 +1,13 @@
+&star_job
+
+/
+
+&controls
+
+  hot_wind_scheme = 'Vink'
+  Vink_scaling_factor = 1.0
+  cool_wind_RGB_scheme = 'Reimers'
+  Reimers_scaling_factor = 0.1
+
+/
+

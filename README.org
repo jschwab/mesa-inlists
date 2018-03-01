@@ -30,3 +30,7 @@ The Importance of Urca-process Cooling in Accreting ONe White Dwarfs
 [[http://adsabs.harvard.edu/abs/2017ApJ...851..105S][Schwab et al. (2017)]]
 
 Exploring the Carbon Simmering Phase: Reaction Rates, Mixing, and the Convective Urca Process
+** 2018MNRAS.........S
+Schwab (2018)
+
+Hot subdwarfs formed from the merger of two He white dwarfs

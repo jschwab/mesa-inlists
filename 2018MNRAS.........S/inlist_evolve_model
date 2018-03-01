@@ -1,0 +1,31 @@
+! inlist to make post-viscous WD merger models
+
+&star_job
+
+  read_extra_star_job_inlist1 = .true.
+  extra_star_job_inlist1_name = 'inlist_other'
+
+/ !end of star_job namelist
+
+
+&controls
+
+  ! use type II opactities
+  use_Type2_opacities = .true.
+  Zbase = 0.02
+
+  ! this can led to species non-conservation
+  smooth_convective_bdy = .false.
+
+  varcontrol_target = 1e-3
+
+  ! stop when we've reached core helium burning
+  xa_central_lower_limit_species(1) = 'he4'
+  xa_central_lower_limit(1) = 0.95
+
+  initial_mass = 0.5
+
+  read_extra_controls_inlist1 = .true.
+  extra_controls_inlist1_name = 'inlist_other'
+
+/ ! end of controls namelist
