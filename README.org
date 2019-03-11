@@ -34,3 +34,7 @@ Exploring the Carbon Simmering Phase: Reaction Rates, Mixing, and the Convective
 [[http://adsabs.harvard.edu/abs/2018MNRAS.476.5303S][Schwab (2018)]]
 
 Hot subdwarfs formed from the merger of two He white dwarfs
+** 2019ApJ...872..131S
+[[http://adsabs.harvard.edu/abs/2019ApJ...872..131S][Schwab and Rocha (2019)]]
+
+Residual Carbon in Oxygen–Neon White Dwarfs and Its Implications for Accretion-induced Collapse

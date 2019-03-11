@@ -1,0 +1,33 @@
+&star_job
+
+  load_saved_model = .true.
+  ! saved_model_name = 'models/final_SQB15.mod'
+  ! saved_model_name = 'models/final_T13.mod'
+  ! saved_model_name = 'models/final_F15.mod'
+  ! saved_model_name = 'models/final_SQB15+.mod'
+
+  saved_model_name = 'models/final_logxna-2.00.mod'
+
+  pgstar_flag = .true.
+
+/ ! end of star_job namelist
+
+&controls
+  log_directory = 'LOGS'
+
+  ! log_directory = 'LOGS-SQB15'
+  ! log_directory = 'LOGS-T13'
+  ! log_directory = 'LOGS-F15'
+
+/ ! end of controls namelist
+
+&pgstar
+  ! file output
+  Grid1_file_flag = .false.
+  Grid1_file_dir = 'png'
+  Grid1_file_prefix = 'grid1'
+  Grid1_file_cnt = 1 ! output when mod(model_number,Grid1_file_cnt)==0
+  Grid1_file_width = 16 ! negative means use same value as for window
+  Grid1_file_aspect_ratio = -1 ! negative means use same value as for window
+
+/ ! end of pgstar namelist

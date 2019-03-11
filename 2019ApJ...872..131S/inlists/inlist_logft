@@ -1,0 +1,24 @@
+&star_job
+
+  load_saved_model = .true.
+  saved_model_name = 'models/final_SQB15+.mod'
+
+  write_profile_when_terminate = .true.
+  filename_for_profile_when_terminate = 'LOGS/final_profile.data'
+
+  save_model_when_terminate = .true.
+  save_model_filename = 'LOGS/final_model.mod'
+
+  pgstar_flag = .false.
+
+/ ! end of star_job namelist
+
+&controls
+  write_profiles_flag = .true.
+  profile_interval = 100000
+
+/ ! end of controls namelist
+
+&pgstar
+
+/ ! end of pgstar namelist

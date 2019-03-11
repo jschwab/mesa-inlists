@@ -1,0 +1,5 @@
+&pgstar
+
+  TRho_Profile_win_flag = .true.
+ 
+/

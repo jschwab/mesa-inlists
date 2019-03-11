@@ -1,0 +1,40 @@
+      include 'sagb_NeNa_MgAl.net'
+
+      add_isos(
+         o19
+         o20 
+         f20
+         f21
+         f23
+         ne23
+         ne24
+         na24
+         ne25
+         na25
+         mg27
+      )
+
+      add_reactions(
+          r_f19_wk_o19,
+          r_o19_wk-minus_f19,
+          r_ne20_wk_f20
+          r_f20_wk-minus_ne20,
+          r_f20_wk_o20,
+          r_o20_wk-minus_f20,
+          r_ne21_wk_f21
+          r_f21_wk-minus_ne21,
+          r_na23_wk_ne23
+          r_ne23_wk-minus_na23
+          r_ne23_wk_f23
+          r_f23_wk-minus_ne23
+          r_mg24_wk_na24
+          r_na24_wk-minus_mg24
+          r_na24_wk_ne24,
+          r_ne24_wk-minus_na24
+          r_mg25_wk_na25
+          r_na25_wk-minus_mg25
+          r_na25_wk_ne25
+          r_ne25_wk-minus_na25
+          r_al27_wk_mg27
+          r_mg27_wk-minus_al27
+      )

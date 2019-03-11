@@ -1,0 +1,31 @@
+
+&star_job
+  save_model_when_terminate = .true.
+  save_model_filename = 'models/composition_withurca_xc-0.030.mod'
+
+/ ! end of star_job namelist
+
+&controls
+  mass_change = 0d0
+
+  accrete_given_mass_fractions = .true.
+  num_accretion_species = 6
+  accretion_species_id(1) = 'o16'
+  accretion_species_id(2) = 'ne20'
+  accretion_species_id(3) = 'mg24'
+  accretion_species_id(4) = 'na23'
+  accretion_species_id(5) = 'mg25'
+  accretion_species_id(6) = 'c12'
+  accretion_species_xa(1) = 0.5d0
+  accretion_species_xa(2) = 0.36d0
+  accretion_species_xa(3) = 0.05d0
+  accretion_species_xa(4) = 0.05d0
+  accretion_species_xa(5) = 0.01d0
+  accretion_species_xa(6) = 0.03d0
+
+
+/ ! end of controls namelist
+
+&pgstar
+
+/ ! end of pgstar namelist

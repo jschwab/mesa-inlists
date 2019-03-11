@@ -1,0 +1,10 @@
+* Section 4
+These are the inlists and machinery used for the calculations of the
+ONe WD models with carbon shown in Section 4 of this paper.  They used
+MESA version r10398.
+
+The script =make_models.sh= generates the initial models (using MESA
+r10000).  For study of the carbon fraction there is a [[https://github.com/wmwolf/MesaScript][MesaScript]] file
+(e.g. =composition.rb=) that generates the inlists and then a bash
+job script (e.g. =composition.sh=) that runs them all.
+

@@ -1,0 +1,15 @@
+&star_job
+
+/ ! end of star_job namelist
+
+&controls
+
+  redo_conv_for_dr_lt_mixing_length = .true.
+  smooth_convective_bdy = .false.
+  mlt_gradT_fraction = 0
+
+/ ! end of controls namelist
+
+&pgstar
+
+/ ! end of pgstar namelist

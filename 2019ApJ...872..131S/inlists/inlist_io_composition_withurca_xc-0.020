@@ -1,0 +1,23 @@
+
+&star_job
+  pgstar_flag = .false.
+
+  load_saved_model = .true.
+  saved_model_name = 'models/final_withurca_xc-0.020.mod'
+
+/ ! end of star_job namelist
+
+&controls
+  log_directory = 'LOGS-carbon'
+
+  history_interval = 1
+  star_history_name = 'withurca_xc-0.020.data'
+
+  write_profiles_flag = .false.
+
+
+/ ! end of controls namelist
+
+&pgstar
+
+/ ! end of pgstar namelist

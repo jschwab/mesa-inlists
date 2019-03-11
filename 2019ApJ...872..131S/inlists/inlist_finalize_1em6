@@ -1,0 +1,44 @@
+
+&star_job
+  save_model_when_terminate = .true.
+  save_model_filename = 'final.mod'
+
+  load_saved_model = .true.
+  saved_model_name = 'initial.mod'
+
+  set_to_this_tau_factor = 300
+  set_tau_factor = .true.
+
+/ ! end of star_job namelist
+
+&controls
+  log_center_density_limit = 8.6
+
+  mass_change = 1d-06
+
+  accrete_same_as_surface = .false.
+  accrete_given_mass_fractions = .true.
+
+  accrete_given_mass_fractions = .true.
+  num_accretion_species = 2
+  accretion_species_id(1) = 'o16'
+  accretion_species_id(2) = 'ne20'
+  accretion_species_xa(1) = 0.5d0
+  accretion_species_xa(2) = 0.5d0
+
+  eps_nuc_factor = 0
+  dxdt_nuc_factor = 0
+
+  use_Type2_opacities = .true.
+  Zbase = 0.02
+
+  varcontrol_target = 0.001
+
+  delta_lgRho_cntr_limit = 0.01
+  delta_lgRho_cntr_hard_limit = 0.03
+
+/ ! end of controls namelist
+
+&pgstar
+
+/ ! end of pgstar namelist
