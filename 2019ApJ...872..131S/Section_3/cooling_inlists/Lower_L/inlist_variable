@@ -1,0 +1,49 @@
+&star_job
+
+    save_model_when_terminate = .true.
+    save_model_filename = 'S16_11.0M_0f_0w_lowerL.mod'
+
+
+    !replace_element = .false.
+    !chem_name1 = 'h1'
+    !chem_name2 = 'he4'
+    !replace_element_nzlo = -1
+    !replace_element_nzhi = -1
+
+
+    !new_rotation_flag = .false.
+    ! change_rotation_flag = .false.
+    !change_initial_rotation_flag = .true.
+
+    ! Suggested by Josiah
+    change_lnPgas_flag = .true.
+    new_lnPgas_flag = .false.
+
+
+
+/ ! end of star_job namelist
+
+
+&controls
+
+    photo_interval = 100
+    profile_interval = 10000
+    history_interval = 1
+    terminal_interval = 1
+    write_header_frequency = 10
+    max_model_number = 5000
+
+    log_L_lower_limit = 3.5
+
+    eps_nuc_factor = 0
+    dxdt_nuc_factor = 0
+    okay_to_reduce_gradT_excess = .true.
+
+
+/ ! end of controls namelist
+
+
+
+&pgstar
+
+/ ! end of pgstar namelist

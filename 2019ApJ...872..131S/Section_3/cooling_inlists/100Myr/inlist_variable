@@ -1,0 +1,55 @@
+&star_job
+
+    save_model_when_terminate = .false.
+    save_model_filename = 'S04_8.4M_100Myr.mod'
+
+
+    replace_element = .false.
+    chem_name1 = 'h1'
+    chem_name2 = 'he4'
+    replace_element_nzlo = -1
+    replace_element_nzhi = -1
+
+    ! 5420 zones total
+    ! zone 500 leaves top He + layer of H below
+
+
+    new_rotation_flag = .false.
+    ! change_rotation_flag = .false.
+    change_initial_rotation_flag = .true.
+
+    ! Suggested by Josiah
+    change_lnPgas_flag = .true.
+    new_lnPgas_flag = .false.
+
+
+
+/ ! end of star_job namelist
+
+
+
+&controls
+
+    photo_interval = 100
+    profile_interval = 10000
+    history_interval = 1
+    terminal_interval = 1
+    write_header_frequency = 10
+    max_model_number = 8000
+
+    eps_nuc_factor = 0
+    dxdt_nuc_factor = 0
+    okay_to_reduce_gradT_excess = .true.
+
+    ! DEFAULT
+    !x_integer_ctrl(1:num_x_ctrls) = 0
+    x_integer_ctrl(1) = 5
+    ! 1.0, 1.2, 1.4 etc
+
+/ ! end of controls namelist
+
+
+
+&pgstar
+
+/ ! end of pgstar namelist

@@ -1,4 +1,17 @@
-* Section 4
+* Section_2 (Led by Rocha)
+These inlists are based on [[http://adsabs.harvard.edu/abs/2015ApJ...807..184F][Farmer et al. (2015)]], but updated to be compatible with MESA version 9793.
+
+The file =run_star_extras_default.f= contains additional code to enforce the stopping condition described in the text.
+
+The file =run_star_extras_default.f= has this termination condition removed and in conjunction with =inlist_control_winds= realizes the artificially envelope stripping procedure described in the text.
+
+* Section_3 (Led by Rocha)
+
+The folder =cooling_inlists= contains two subfolders.  The folder =100Myr= cools the models for 100 Myr as described in the text.  The folder =Lower_L= contains inlists used for a short time at the start of cooling (until =log_L_lower_limit = 3.5=) to circumvent numerical issues in models that were  struggling at the start.
+
+The final cooled models are included in the =Cooled_models= directory.
+
+* Section_4 (Led by Schwab)
 These are the inlists and machinery used for the calculations of the
 ONe WD models with carbon shown in Section 4 of this paper.  They used
 MESA version r10398.
@@ -8,3 +21,6 @@ r10000).  For study of the carbon fraction there is a [[https://github.com/wmwol
 (e.g. =composition.rb=) that generates the inlists and then a bash
 job script (e.g. =composition.sh=) that runs them all.
 
+* Section_5 (Led by Rocha)
+
+These inlists were used with MESA r9793 to evolve the cooled WD models towards collapse, as described in the text.

@@ -1,0 +1,32 @@
+&star_job
+
+! set initial model information
+
+
+      create_pre_main_sequence_model = .true.
+      kappa_file_prefix = 'gs98'
+      change_lnPgas_flag = .true.
+      new_lnPgas_flag = .true.
+      change_net = .true.
+      new_net_name = 'sagb_NeNa_MgAl.net'
+      ! So we can see live plotting
+      pgstar_flag = .true.
+      pre_ms_relax_num_steps = 200
+
+      save_model_when_terminate = .true.
+      save_model_filename = 'c_ign_end.mod'
+
+
+      new_rotation_flag = .true.
+      change_rotation_flag = .false.
+
+      near_zams_relax_omega_div_omega_crit = .true.  ! true to turn on rotation at zams
+
+
+      num_steps_to_relax_rotation = 100   ! use this many steps to change value
+
+      new_omega_div_omega_crit = 0.00
+
+
+
+/ ! end of star_job namelist

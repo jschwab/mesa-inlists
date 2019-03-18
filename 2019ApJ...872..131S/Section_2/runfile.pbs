@@ -1,0 +1,53 @@
+#!/bin/bash
+
+#PBS -N S10_7.6M_Farmer
+#PBS -l nodes=1:ppn=16
+#PBS -l walltime=20:00:00
+#PBS -V
+#PBS -m abe
+#PBS -M karocha@ucsc.edu
+
+# Run Specifications
+# 7.2M, all overshoot = 0.016, 0 omega
+
+cd $PBS_O_WORKDIR
+cd /pfs/karocha/Runs/S10_7.6M_Farmer
+
+# load SDK
+export MESASDK_ROOT=/pfs/karocha/mesasdk
+source $MESASDK_ROOT/bin/mesasdk_init.sh
+
+# set MESA_DIR
+export MESA_DIR=/pfs/karocha/mesa-r9793
+
+
+# Make clean
+./clean
+
+# link DEFAULT insist_control and run_star_extras
+ln -sf run_star_extras_default.f src/run_star_extras.f
+ln -sf inlist_control_default inlist_control
+
+# compile
+./mk
+
+# run
+./rn
+
+
+# link NEW inlist_control and run_star_extras
+ln -sf run_star_extras_winds.f src/run_star_extras.f
+ln -sf inlist_control_winds inlist_control
+
+# re clean
+./clean
+
+# re compile
+./mk
+
+# restart at last photo with winds
+./re $(ls -tr1 photos | tail -1)
+
+
+# make movie
+images_to_movie.sh 'Grid1/grid1_*.png' grid_S10_7.6M_0w_Farmer.mp4

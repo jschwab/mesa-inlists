@@ -1,0 +1,32 @@
+&star_job
+
+    save_model_when_terminate = .true.
+    save_model_filename = 'S01_7.2M_acc_newNet.mod'
+
+    new_rotation_flag = .false.
+    ! change_rotation_flag = .false.
+    change_initial_rotation_flag = .true.
+
+
+
+/ ! end of star_job namelist
+
+
+
+&controls
+
+    photo_interval = 100
+    profile_interval = 10000
+    history_interval = 1
+    terminal_interval = 1
+    write_header_frequency = 10
+    max_model_number = 5000
+
+
+/ ! end of controls namelist
+
+
+
+&pgstar
+
+/ ! end of pgstar namelist

@@ -1,0 +1,142 @@
+&controls
+      initial_mass = 7.6
+      initial_z = 0.020
+! output
+
+      photo_interval = 500
+      ! Changed from 'photostep'
+
+      profile_interval =  10000
+      history_interval = 1
+
+      terminal_interval = 100
+      ! Changed from 'terminal_cnt'
+
+      write_header_frequency = 100
+      max_model_number = 10000
+      !max_model_number = -1
+
+! opacities
+
+      use_Type2_opacities = .true.
+      Zbase = 0.02
+
+
+! range of O core mass ( originally = 0.01 )
+
+      o_core_boundary_c12_fraction = 0.1
+
+
+! winds
+
+      cool_wind_RGB_scheme = 'Reimers'
+      cool_wind_AGB_scheme = 'Blocker'
+      RGB_to_AGB_wind_switch = 1d-4
+      Reimers_scaling_factor = 0.5d0
+      Blocker_scaling_factor = 0.05d0
+
+! resolution
+
+      mesh_delta_coeff = 0.5
+      max_allowed_nz = 400000
+
+! resolution
+
+      mesh_dlog_burn_c_dlogP_extra = 0.10
+      mesh_dlog_cc_dlogP_extra = 0.10
+      mesh_dlog_co_dlogP_extra = 0.10
+      mesh_dlog_oo_dlogP_extra = 0.10
+
+      mesh_logX_species(1) = 'c12'
+      mesh_logX_min_for_extra(1) = -2
+      mesh_dlogX_dlogP_extra(1) = 0.5
+      mesh_dlogX_dlogP_full_on(1) = 0
+      mesh_dlogX_dlogP_full_off(1) = -1
+
+      mesh_logX_species(2) = 'h1'
+      mesh_logX_min_for_extra(2) = -2
+      mesh_dlogX_dlogP_extra(2) = 0.5
+      mesh_dlogX_dlogP_full_on(2) = 0
+      mesh_dlogX_dlogP_full_off(2) = -1
+
+      mesh_logX_species(3) = 'he4'
+      mesh_logX_min_for_extra(3) = -2
+      mesh_dlogX_dlogP_extra(3) = 0.5
+      mesh_dlogX_dlogP_full_on(3) = 0
+      mesh_dlogX_dlogP_full_off(3) = -1
+
+      mesh_dlog_pp_dlogP_extra = 0.25
+      xa_mesh_delta_coeff(1) = 0.5
+      xa_mesh_delta_coeff(2) = 0.5
+      xa_mesh_delta_coeff(3) = 0.5
+
+      varcontrol_target = 1d-4
+
+! overshoot
+
+         ! For non-zero f we must explicitly define non-zero f0
+         ! All values of f0 set to f as default
+
+         overshoot_f_above_nonburn_core = 0.016   ! for nonburning regions
+         overshoot_f0_above_nonburn_core = 0.016
+         overshoot_f_above_nonburn_shell = 0.016
+         overshoot_f0_above_nonburn_shell = 0.016
+         overshoot_f_below_nonburn_shell = 0.016
+         overshoot_f0_below_nonburn_shell = 0.016
+
+
+         overshoot_f_above_burn_h_core = 0.016    ! for hydrogen burning regions
+         overshoot_f0_above_burn_h_core = 0.016
+         overshoot_f_above_burn_h_shell = 0.016
+         overshoot_f0_above_burn_h_shell = 0.016
+         overshoot_f_below_burn_h_shell = 0.016
+         overshoot_f0_below_burn_h_shell = 0.016
+
+         overshoot_f_above_burn_he_core = 0.016   ! for helium burning regions
+         overshoot_f0_above_burn_he_core = 0.016
+         overshoot_f_above_burn_he_shell = 0.016
+         overshoot_f0_above_burn_he_shell = 0.016
+         overshoot_f_below_burn_he_shell = 0.016
+         overshoot_f0_below_burn_he_shell = 0.016
+
+         overshoot_f_above_burn_z_core = 0.016    ! for heavier than helium burning region
+         overshoot_f0_above_burn_z_core = 0.016
+         overshoot_f_above_burn_z_shell = 0.016
+         overshoot_f0_above_burn_z_shell = 0.016
+         overshoot_f_below_burn_z_shell = 0.016
+         overshoot_f0_below_burn_z_shell = 0.016
+
+         D_mix_ov_limit = 1d2
+
+! semiconvection
+
+      !allow_semiconvective_mixing = .true.
+      ! Replaced by **
+
+      alpha_semiconvection = 1d-2
+      semiconvection_option = 'Langer_85 mixing; gradT = gradr'
+
+! thermohaline
+
+      !allow_thermohaline_mixing = .true.
+      ! Replaced by **
+
+      thermohaline_coeff = 1
+      ! Changed from 'thermo_haline_coeff'
+
+      thermohaline_option = 'Kippenhahn'
+
+! **
+      use_Ledoux_criterion = .true.
+
+! angular momentum transport
+
+      am_D_mix_factor = 0.0333333333333
+      D_DSI_factor = 1
+      D_SH_factor  = 1
+      D_SSI_factor = 1
+      D_ES_factor  = 1
+      D_GSF_factor = 1
+      D_ST_factor  = 1
+
+/ ! end of controls namelist
