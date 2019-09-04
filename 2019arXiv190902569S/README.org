@@ -1,0 +1,6 @@
+* Evolutionary models for R Coronae Borealis stars
+** make-HeCO-models
+This directory creates the schematic merger models.
+** mesa-RCrB-grid
+This directory evolves the merger models to, through, and beyond the
+RCrB phase.

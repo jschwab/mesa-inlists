@@ -1,0 +1,16 @@
+&star_job
+
+/ !end of star_job namelist
+
+
+&controls
+
+  ! stop once the He layer is the max mass of a He WD
+  he_layer_mass_lower_limit = 0.45
+
+  ! don't need output here
+  do_history_file = .false.
+  write_profiles_flag = .false.
+  photo_interval = 1000
+
+/ ! end of controls namelist

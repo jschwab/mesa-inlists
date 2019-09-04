@@ -1,0 +1,17 @@
+
+&star_job
+  load_saved_model = .true.
+  saved_model_name = 'heco_models/he_0.45_co_0.60.mod'
+
+  set_initial_model_number = .true.
+  initial_model_number = 0
+
+/ ! end of star_job namelist
+
+&controls
+
+/ ! end of controls namelist
+
+&pgstar
+
+/ ! end of pgstar namelist

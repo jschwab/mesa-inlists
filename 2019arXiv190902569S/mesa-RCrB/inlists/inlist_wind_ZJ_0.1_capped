@@ -1,0 +1,11 @@
+&star_job
+
+/
+
+&controls
+
+  use_other_wind = .true.
+  Reimers_scaling_factor = 0.1
+  x_logical_ctrl(2) = .true.
+
+/

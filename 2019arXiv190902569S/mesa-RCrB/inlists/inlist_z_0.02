@@ -1,0 +1,17 @@
+
+&star_job
+
+/ ! end of star_job namelist
+
+&controls
+  initial_z = 0.02
+
+  Zbase = 0.02d0
+
+  zams_filename = 'zams/he_zams_z0.02.data'
+
+/ ! end of controls namelist
+
+&pgstar
+
+/ ! end of pgstar namelist

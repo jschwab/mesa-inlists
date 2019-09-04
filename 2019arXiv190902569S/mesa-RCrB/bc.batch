@@ -1,0 +1,6 @@
+M0.85-Z0.006-R1-eg inlist_mass_0.850 inlist_z_0.006 inlist_weiss_R1 inlist_eddington_grey
+M0.85-Z0.006-R1-gk inlist_mass_0.850 inlist_z_0.006 inlist_weiss_R1 inlist_grey_and_kap
+M0.85-Z0.006-R1-T1 inlist_mass_0.850 inlist_z_0.006 inlist_weiss_R1 inlist_type1_kap
+M0.85-Z0.006-R1-FA inlist_mass_0.850 inlist_z_0.006 inlist_weiss_R1 inlist_fa05_kap
+M0.85-Z0.006-R1-MLTA-1.5 inlist_mass_0.850 inlist_z_0.006 inlist_weiss_R1 inlist_mlt_alpha_1.5
+M0.85-Z0.006-R1-MLTA-2.5 inlist_mass_0.850 inlist_z_0.006 inlist_weiss_R1 inlist_mlt_alpha_2.5

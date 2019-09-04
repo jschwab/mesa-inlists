@@ -1,0 +1,14 @@
+&star_job
+
+  ! use FA05 opacities
+  kappa_lowT_prefix = 'lowT_fa05_gs98'
+
+/ !end of star_job namelist
+
+
+&controls
+
+  ! do not use C/O enhanced opacities
+  use_Type2_opacities = .false.
+
+/ ! end of controls namelist

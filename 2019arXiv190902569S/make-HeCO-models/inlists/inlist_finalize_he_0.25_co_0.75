@@ -1,0 +1,15 @@
+
+&star_job
+  save_model_filename = 'final_models/he_0.25_co_0.75.mod'
+
+  saved_model_name = 'models/entropy_he_0.25_co_0.75.mod'
+
+/ ! end of star_job namelist
+
+&controls
+
+/ ! end of controls namelist
+
+&pgstar
+
+/ ! end of pgstar namelist

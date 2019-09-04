@@ -38,3 +38,7 @@ Hot subdwarfs formed from the merger of two He white dwarfs
 [[http://adsabs.harvard.edu/abs/2019ApJ...872..131S][Schwab and Rocha (2019)]]
 
 Residual Carbon in Oxygen–Neon White Dwarfs and Its Implications for Accretion-induced Collapse
+** 2019arXiv190902569S
+[[https://ui.adsabs.harvard.edu/abs/2019arXiv190902569S/abstract][Schwab (2019)]]
+
+Evolutionary models for R Coronae Borealis stars

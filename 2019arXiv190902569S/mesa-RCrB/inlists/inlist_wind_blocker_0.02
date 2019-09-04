@@ -1,0 +1,10 @@
+&star_job
+
+/
+
+&controls
+
+  cool_wind_AGB_scheme = 'Blocker'
+  Blocker_scaling_factor = 0.02
+
+/

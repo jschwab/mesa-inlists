@@ -1,0 +1,26 @@
+&star_job
+
+    load_saved_model = .true.
+    saved_model_name = 'pms.mod'
+
+    save_model_when_terminate = .true.
+    save_model_filename = "composition.mod"
+
+    relax_initial_composition = .true.
+    num_steps_to_relax_composition = 100
+
+/ ! end of star_job namelist
+
+&controls
+
+  ! when to stop
+    log_center_density_limit = 5
+
+  ! turn off nuclear reactions
+    eps_nuc_factor = 0
+    dxdt_nuc_factor = 0
+
+  ! turn off mixing
+    mix_factor = 0
+
+/ ! end of controls namelist

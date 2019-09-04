@@ -1,0 +1,59 @@
+&star_job
+
+  ! display on-screen plots
+  pgstar_flag = .true.
+
+  ! PC/HELM blend giving numerical issues; 
+  set_eos_PC_parameters = .true.
+  PC_min_Z = 999d0
+
+  ! set EOS blend
+  kappa_blend_logT_lower_bdy = 4.1
+  kappa_blend_logT_upper_bdy = 4.2
+  kappa_lowT_prefix = 'AESOPUS_GS98_RCrB_Z0.006' 
+
+
+/ !end of star_job namelist
+
+&controls
+
+  ! use C/O enhanced opacities
+  use_Type2_opacities = .true.
+  Zbase = 0.006
+
+  dHe_limit_min_He = 0.01
+  dHe_limit = 0.01
+
+  varcontrol_target = 3e-4
+
+  ! ! use gradT smoothing from Pablo
+  ! smooth_gradT = .true.
+  ! gradT_smooth_low = -0.01d0
+  ! gradT_smooth_high = 0.02d0
+
+  ! ! some other stuff from Pablo
+  ! timestep_factor_for_retries = 0.8
+  ! timestep_factor_for_backups = 0.8
+  ! min_timestep_factor = 0.9
+  ! max_timestep_factor = 1.05
+  ! backup_hold = 10
+  ! retry_hold = 5
+
+  max_model_number = 10000
+
+  write_profiles_flag = .true.
+  profile_interval = 10000
+  photo_interval = 500
+  history_interval = 1
+
+  ! write a profile every 0.01 Msun of C core mass
+  x_integer_ctrl(1) = 100
+
+  ! turn off gold tolerances for first part of evolution
+  x_logical_ctrl(1) = .true.
+
+  ! fall back to standard dLdm form
+  use_dedt_form_of_energy_eqn = .false.
+  use_eps_mdot = .false.
+
+/ ! end of controls namelist

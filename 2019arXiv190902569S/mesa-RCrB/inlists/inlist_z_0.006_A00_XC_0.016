@@ -1,0 +1,25 @@
+
+&star_job
+  kappa_lowT_prefix = 'AESOPUS_GS98_RCrB_Z0.006'
+
+/ ! end of star_job namelist
+
+&controls
+  num_accretion_species = 5
+  accretion_species_id(1) = 'he4'
+  accretion_species_id(2) = 'c12'
+  accretion_species_id(3) = 'n14'
+  accretion_species_id(4) = 'o16'
+  accretion_species_id(5) = 'o18'
+  accretion_species_xa(1) = 0.961671d0
+  accretion_species_xa(2) = 0.0162595d0
+  accretion_species_xa(3) = 0.0150612d0
+  accretion_species_xa(4) = 0.00350425d0
+  accretion_species_xa(5) = 0.00350425d0
+
+
+/ ! end of controls namelist
+
+&pgstar
+
+/ ! end of pgstar namelist

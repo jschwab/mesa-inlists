@@ -1,0 +1,17 @@
+
+&star_job
+  save_model_filename = 'models/composition_he_0.20_co_0.85.mod'
+
+  saved_model_name = 'models/pms_he_0.20_co_0.85.mod'
+
+  relax_composition_filename = 'compositions/he_0.20_co_0.85.dat'
+
+/ ! end of star_job namelist
+
+&controls
+
+/ ! end of controls namelist
+
+&pgstar
+
+/ ! end of pgstar namelist

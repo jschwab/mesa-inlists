@@ -1,0 +1,29 @@
+&star_job
+
+  change_net = .true.
+  new_net_name = 'o18_and_ne22.net'
+
+  kappa_blend_logT_lower_bdy = 4.1
+  kappa_blend_logT_upper_bdy = 4.2
+
+/ !end of star_job namelist
+
+
+&controls
+
+  ! use C/O enhanced opacities
+  use_Type2_opacities = .true.
+
+  dHe_limit_min_He = 0.01
+  dHe_limit = 0.01
+
+  varcontrol_target = 1e-3
+
+  use_gold_tolerances = .true.
+  use_dedt_form_of_energy_eqn = .true.
+  use_eps_mdot = .true.
+
+  terminal_interval = 50
+
+
+/ ! end of controls namelist

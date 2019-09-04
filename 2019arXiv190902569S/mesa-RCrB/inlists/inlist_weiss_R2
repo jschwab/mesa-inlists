@@ -1,0 +1,34 @@
+&star_job
+
+  kappa_lowT_prefix  = 'AESOPUS_GS98_RCrB_Z0.006'
+
+/
+
+&controls
+
+  num_accretion_species = 6
+
+  ! Y = 0.972
+  accretion_species_id(1) = 'he4'
+  accretion_species_xa(1) = 0.903
+
+  ! XC = 0.012
+  accretion_species_id(2) = 'c12'
+  accretion_species_xa(2) = 0.081
+
+  ! XO = 0.01
+  accretion_species_id(4) = 'o16'
+  accretion_species_xa(4) = 0.010
+
+  ! Z = 0.006
+  ! ratios like He ZAMS file
+  accretion_species_id(3) = 'n14'
+  accretion_species_xa(3) = 0.0042
+
+  accretion_species_id(5) = 'ne20'
+  accretion_species_xa(5) = 0.0006
+
+  accretion_species_id(6) = 'mg24'
+  accretion_species_xa(6) = 0.0012
+
+/

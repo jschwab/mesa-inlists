@@ -1,0 +1,12 @@
+&star_job
+
+  kappa_lowT_prefix = 'lowT_fa05_gs98'
+
+/
+
+&controls
+
+  accrete_same_as_surface = .true.
+  accrete_given_mass_fractions = .true.
+
+/

@@ -1,0 +1,5 @@
+M0.875-Z0.006-sas inlist_mass_0.875 inlist_z_0.006 inlist_same_as_surface inlist_empty
+M0.875-Z0.006-R1 inlist_mass_0.875 inlist_z_0.006 inlist_weiss_R1 inlist_empty
+M0.875-Z0.006-R2 inlist_mass_0.875 inlist_z_0.006 inlist_weiss_R2 inlist_empty
+
+

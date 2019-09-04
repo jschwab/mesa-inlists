@@ -1,0 +1,10 @@
+&star_job
+
+/
+
+&controls
+
+  use_other_wind = .true.
+  x_ctrl(4) = 0.001
+
+/

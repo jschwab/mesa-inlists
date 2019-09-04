@@ -1,0 +1,9 @@
+&star_job
+/
+
+&controls
+
+  eps_nuc_factor = 0
+  dxdt_nuc_factor = 0
+
+/

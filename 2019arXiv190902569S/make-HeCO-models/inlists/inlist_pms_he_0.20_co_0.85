@@ -1,0 +1,15 @@
+
+&star_job
+  save_model_filename = 'models/pms_he_0.20_co_0.85.mod'
+
+/ ! end of star_job namelist
+
+&controls
+  initial_mass = 1.05d0
+
+
+/ ! end of controls namelist
+
+&pgstar
+
+/ ! end of pgstar namelist

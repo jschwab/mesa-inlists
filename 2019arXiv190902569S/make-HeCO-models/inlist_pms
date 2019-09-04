@@ -1,0 +1,24 @@
+&star_job
+
+    create_pre_main_sequence_model = .true.
+
+    save_model_when_terminate = .true.
+    save_model_filename = "pms.mod"
+
+    change_net = .true.
+    new_net_name = 'o18_and_ne22.net'
+
+/ ! end of star_job namelist
+
+&controls
+
+    initial_y = 1.0
+
+  ! when to stop
+    log_center_density_limit = 3
+
+  ! turn off nuclear reactions
+    eps_nuc_factor = 0
+    dxdt_nuc_factor = 0
+
+/ ! end of controls namelist

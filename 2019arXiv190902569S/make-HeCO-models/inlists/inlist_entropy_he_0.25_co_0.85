@@ -1,0 +1,19 @@
+
+&star_job
+  save_model_filename = 'models/entropy_he_0.25_co_0.85.mod'
+
+  filename_for_profile_when_terminate = 'models/entropy_he_0.25_co_0.85.data'
+
+  saved_model_name = 'models/composition_he_0.25_co_0.85.mod'
+
+/ ! end of star_job namelist
+
+&controls
+  x_ctrl(1) = 0.85d0
+
+
+/ ! end of controls namelist
+
+&pgstar
+
+/ ! end of pgstar namelist

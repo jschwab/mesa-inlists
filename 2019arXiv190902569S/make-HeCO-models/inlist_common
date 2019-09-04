@@ -1,0 +1,13 @@
+&star_job
+
+    pgstar_flag = .false.
+
+/ ! end of star_job namelist
+
+&controls
+
+    initial_z = 0.006
+    use_Type2_opacities = .true.
+    Zbase = 0.006
+
+/ ! end of controls namelist

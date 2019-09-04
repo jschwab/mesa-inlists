@@ -1,0 +1,10 @@
+* make-HeCO-models
+This directory produces the schematic merger models. It was run with
+MESA r11701.
+
+The script =basic_heco.rb= generates the inlists.  This makes use of
+Bill Wolf's [[https://github.com/wmwolf/MesaScript][MesaScript]].
+
+The PBS batch script =make_models.sh= runs these inlists.  For
+convenience, this the generated models are included in the folder
+final_models.

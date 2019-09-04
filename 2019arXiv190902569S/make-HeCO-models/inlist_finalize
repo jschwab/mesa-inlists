@@ -1,0 +1,22 @@
+&star_job
+
+    load_saved_model = .true.
+    save_model_when_terminate = .true.
+
+    set_initial_age = .true.
+    initial_age = 0
+
+    set_initial_model_number = .true.
+    initial_model_number = 0
+
+    set_initial_cumulative_energy_error = .true.
+    new_cumulative_energy_error = 0d0
+/
+
+&controls
+
+    max_age = 1d-4
+
+    use_gold_tolerances = .false.
+
+/

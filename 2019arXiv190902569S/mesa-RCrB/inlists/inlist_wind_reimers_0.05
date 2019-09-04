@@ -1,0 +1,10 @@
+&star_job
+
+/
+
+&controls
+
+  cool_wind_AGB_scheme = 'Reimers'
+  Reimers_scaling_factor = 0.05
+
+/

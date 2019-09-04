@@ -1,0 +1,29 @@
+&star_job
+
+    load_saved_model = .true.
+    save_model_when_terminate = .true.
+    write_profile_when_terminate = .true.
+    
+/ ! end of star_job namelist
+
+&controls
+
+  ! turn off nuclear reactions and neutrinos
+    eps_nuc_factor = 0
+    dxdt_nuc_factor = 0
+    non_nuc_neu_factor = 0
+
+  ! turn off mixing
+    mix_factor = 0
+
+  ! fixed heating parameters
+    x_ctrl(2) = 1e9
+    x_ctrl(3) = 1e8
+    x_ctrl(4) = -1d0
+
+    use_other_energy = .true.
+    log_center_temp_lower_limit = 7.5d0
+
+    use_gold_tolerances = .false.
+
+/ ! end of controls namelist
